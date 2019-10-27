@@ -1,0 +1,12 @@
+{
+    "logo":"C:\\Users\\Agustin\\Documents\\python\\game\\data\\images\\logoJelly.png",
+    "caption":"Juego",
+    "dimension":[640, 400],
+    "titulo":{
+        "fuente":"C:\\Windows\\Fonts\\BAUHS93.TTF",
+        "str":["AGUSTIN", "GARCIA"]        
+    },
+    "info":{
+        "fuente":"C:\\Windows\\Fonts\\coure.fon"
+    }
+}
