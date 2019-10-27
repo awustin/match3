@@ -34,15 +34,15 @@ class Tablero:
             y = y0 + X_CELDA*row
             for col in (range(N_CELDAS)):
                 x = x0 + X_CELDA*col
-                color_base = (color_base[0] + 1, color_base[1] + row, color_base[2] + 1*col)
+                color_base = (color_base[0] + 1, color_base[1] + row,
+                              color_base[2] + 1*col)
                 print(color_base)
                 colorij = pygame.Color(*color_base)
                 celdaij = Celda(X_CELDA, X_CELDA, colorij)
                 celdaij.setPosicionCentro(x, y)
                 celdaij.setOffsetAbs(self.__pos[0], self.__pos[1])
-                # rectij = Rect(0, 0, X_CELDA, X_CELDA)
-                # rectij.center = (x, y)
-                pygame.draw.rect(self.__surf, colorij, celdaij.getRect())
+                pygame.draw.rect(self.__surf, celdaij.getColor(),
+                                 celdaij.getRect())
                 print(celdaij.getPosicionCentro())
                 self.__celdas[row].append(celdaij)
 
@@ -52,24 +52,34 @@ class Tablero:
             for row in range(N_CELDAS):
                 for col in range(N_CELDAS):
                     ficha = self.handler.requestFicha(row, col)
-                    if(ficha == 1):
-                        color = (255, 0, 0)
-                    elif(ficha == 2):
-                        color = (0, 255, 0)
-                    elif(ficha == 3):
-                        color = (0, 0, 255)
-                    elif(ficha == 4):
-                        color = (255, 255, 0)
+                    celda = self.__celdas[row][col]
+                    celda.setFicha(ficha)
+                    color = celda.getColorFicha()
                     gfxdraw.aacircle(self.__surf,
-                                     *self.__celdas[row][col].
-                                     getPosicionCentro(),
+                                     *celda.getPosicionCentro(),
                                      15, color)
+                    gfxdraw.filled_circle(self.__surf,
+                                          *celda.getPosicionCentro(),
+                                          15, color)
         self.__completa = True
 
     def clickXY(self, x, y):
+        dentroCuadricula = False
         self.handler.clickXY(x, y)
-        if(self.__celdas[0][0].esClickeada(x, y)):
-            print("celda[0][0]")
+        for row in range(N_CELDAS):
+            for col in range(N_CELDAS):
+                celda = self.__celdas[row][col]
+                if(celda.esClickeada(x, y)):
+                    # TODO: La celda se selecciona
+                    celda.switchSeleccionar()
+                    color = celda.getColorFicha()
+                    print("Seleccionada: %s en %d, %d" % (celda.getSeleccionada(), row, col))
+                    gfxdraw.filled_circle(self.__surf,
+                                          *celda.getPosicionCentro(),
+                                          15, color)
+                    dentroCuadricula = True
+        if(not dentroCuadricula):
+            print("Fuera del tablero")
 
     def setCompleto(self, completo):
         self.__completa = False
