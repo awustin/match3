@@ -47,13 +47,15 @@ class Tablero:
                 self.__celdas[row].append(celdaij)
 
     def dibujarFormas(self):
-        # En el Calculador: Se debe registrar qué ficha va en la matriz
+        # En el Calculador: Se registra qué ficha va en la matriz
         if(not self.__completa):
+            self.handler.limpiarSeleccion()
             for row in range(N_CELDAS):
                 for col in range(N_CELDAS):
                     ficha = self.handler.requestFicha(row, col)
                     celda = self.__celdas[row][col]
                     celda.setFicha(ficha)
+                    celda.deseleccionarFicha()
                     color = celda.getColorFicha()
                     gfxdraw.aacircle(self.__surf,
                                      *celda.getPosicionCentro(),
@@ -64,22 +66,56 @@ class Tablero:
         self.__completa = True
 
     def clickXY(self, x, y):
+        limpiar = False
         dentroCuadricula = False
-        self.handler.clickXY(x, y)
         for row in range(N_CELDAS):
             for col in range(N_CELDAS):
                 celda = self.__celdas[row][col]
                 if(celda.esClickeada(x, y)):
-                    # TODO: La celda se selecciona
-                    celda.switchSeleccionar()
+                    dentroCuadricula = True
+                    estadoFicha = self.handler.clickSeleccionXY(row, col)
+                    if(estadoFicha['seleccionada']):
+                        celda.seleccionarFicha()
+                    else:
+                        celda.deseleccionarFicha()
+                    if(estadoFicha['swap']):
+                        limpiar = True
+                        print("swapping")
+                        break
                     color = celda.getColorFicha()
-                    print("Seleccionada: %s en %d, %d" % (celda.getSeleccionada(), row, col))
+                    print("Seleccionada: %s en %d, %d" % (celda.
+                                                          getSeleccionada(),
+                                                          row, col))
                     gfxdraw.filled_circle(self.__surf,
                                           *celda.getPosicionCentro(),
                                           15, color)
-                    dentroCuadricula = True
+                    break
         if(not dentroCuadricula):
             print("Fuera del tablero")
+        if(limpiar):
+            fichas = self.handler.requestFichas()
+            print(fichas)
+            self.handler.limpiarSeleccion()
+            for row in range(N_CELDAS):
+                for col in range(N_CELDAS):
+                    celda = self.__celdas[row][col]
+                    celda.setFicha(fichas[row][col])
+                    celda.deseleccionarFicha()
+                    color = celda.getColorFicha()
+                    gfxdraw.filled_circle(self.__surf,
+                                          *celda.getPosicionCentro(),
+                                          15, color)
+
+    def reiniciarSeleccionFichas(self):
+        for row in range(N_CELDAS):
+            for col in range(N_CELDAS):
+                celda = self.__celdas[row][col]
+                if(celda.getSeleccionada()):
+                    celda.deseleccionarFicha()
+                    color = celda.getColorFicha()
+                    gfxdraw.filled_circle(self.__surf,
+                                          *celda.getPosicionCentro(),
+                                          15, color)
 
     def setCompleto(self, completo):
         self.__completa = False

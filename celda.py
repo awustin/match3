@@ -16,7 +16,7 @@ class Celda(object):
 
     def getSeleccionada(self):
         return self.__seleccionada
-    
+
     def seleccionarFicha(self):
         self.__seleccionada = True
 
@@ -78,3 +78,5 @@ class Celda(object):
         elif(self.__ficha == 4):
             self.__fichaColor = (255, 255, 0)
 
+    def getFicha(self):
+        return self.__ficha

@@ -15,7 +15,17 @@ class Handler(object):
         return ficha
 
     def requestFichas(self):
-        self.__calculador.getFichas()
+        return self.__calculador.getFichas()
 
-    def clickXY(self, x, y):
-        self.__calculador.setClickXY(x, y)
+    def limpiarSeleccion(self):
+        self.__calculador.limpiarFichasSeleccionadas()
+
+    # clickSeleccionXY: recibe los indices de la cuadricula
+    def clickSeleccionXY(self, x, y):
+        estadoFicha = {'seleccionada': False, 'swap': False}
+        self.__calculador.logicaSeleccionFichas(x, y, estadoFicha)
+        return estadoFicha
+
+    def estaSeleccionada(self, x, y):
+        seleccionada = self.__calculador.estaEnLaSeleccion(x, y)
+        return seleccionada
