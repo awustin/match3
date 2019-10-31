@@ -73,14 +73,23 @@ class Calculador(object):
         return seleccionada
 
     def buscarMatches(self):
+        alineacionesH = self.__buscarHorizontales()
+        print(f'Hay {len(alineacionesH)} horziontales: {alineacionesH}')
+        alineacionesV = self.__buscarVerticales()
+        print(f'Hay {len(alineacionesV)} verticales: {alineacionesV}')
+
+    def __buscarHorizontales(self):
         fichas = self.__fichas
+        alineacionesH = []
         alineadas = []
         horizontal = []
-        vertical = []
+        cont = 0
         for row in range(len(fichas)):
             if(len(horizontal) > 2):
-                print("FILA %d, Alineacion de %d" % (row-1, len(horizontal)))
-                print(alineadas)
+                # print("FILA %d, Alineacion de %d" % (row-1, len(horizontal)))
+                #print(alineadas)
+                alineacionesH.append(alineadas)
+                cont = cont + 1
             horizontal = []
             alineadas = []
             for col in range(len(fichas[row])):
@@ -91,10 +100,46 @@ class Calculador(object):
                     continue
                 if((horizontal[0] - candidato) != 0):
                     if(len(horizontal) > 2):
-                        print("FILA %d, Alineacion de %d" % (row, len(horizontal)))
+                        # print("FILA %d, Alineacion de %d" % (row,
+                        #      len(horizontal)))
                         print(alineadas)
+                        alineacionesH.append(alineadas)
+                        cont = cont + 1
                     horizontal = []
                     alineadas = []
                 horizontal.append(candidato)
                 alineadas.append((row, col))
+        return alineacionesH
 
+    def __buscarVerticales(self):
+        fichas = self.__fichas
+        cont = 0
+        alineacionesV = []
+        alineadas = []
+        vertical = []
+        for col in range(len(fichas)):
+            if(len(vertical) > 2):
+                #print("COLUMNA %d, Alineacion de %d" % (col-1, len(vertical)))
+                #print(alineadas)
+                alineacionesV.append(alineadas)
+                cont = cont + 1
+            vertical = []
+            alineadas = []
+            for row in range(len(fichas[col])):
+                candidato = fichas[row][col]
+                if(row == 0):
+                    vertical.append(candidato)
+                    alineadas.append((row, col))
+                    continue
+                if((vertical[0] - candidato) != 0):
+                    if(len(vertical) > 2):
+                        #print("COLUMNA %d, Alineacion de %d" % (col,
+                        #      len(vertical)))
+                        #print(alineadas)
+                        alineacionesV.append(alineadas)
+                        cont = cont + 1
+                    vertical = []
+                    alineadas = []
+                vertical.append(candidato)
+                alineadas.append((row, col))
+        return alineacionesV
