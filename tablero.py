@@ -113,9 +113,24 @@ class Tablero:
     
     # Metodo que pregunta al calculador si hay matches
     def verificarMatches(self):
+        celdas = self.__celdas
+        alineaciones = []
         if(not self.__matches):
-            self.handler.requestMatches()
+            alineaciones = self.handler.requestMatches()
             self.__matches = True
+        if(len(alineaciones) != 0):
+            for hor in alineaciones[0]:
+                celdaini = hor[0]
+                x1 = celdaini[0]
+                y1 = celdaini[1]
+                celdafin = hor[len(hor)-1]
+                x2 = celdafin[0]
+                y2 = celdafin[1]
+                inicio = celdas[x1][y1].getPosicionCentro()
+                fin = celdas[x2][y2].getPosicionCentro()
+                color = (255, 255, 255)
+                gfxdraw.hline(self.__surf, inicio[0], fin[0], inicio[1], color)
+
 
     def setCompleto(self, completo):
         self.__completa = completo

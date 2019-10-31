@@ -74,9 +74,8 @@ class Calculador(object):
 
     def buscarMatches(self):
         alineacionesH = self.__buscarHorizontales()
-        print(f'Hay {len(alineacionesH)} horziontales: {alineacionesH}')
         alineacionesV = self.__buscarVerticales()
-        print(f'Hay {len(alineacionesV)} verticales: {alineacionesV}')
+        return (alineacionesH, alineacionesV)
 
     def __buscarHorizontales(self):
         fichas = self.__fichas

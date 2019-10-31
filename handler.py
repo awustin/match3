@@ -32,4 +32,4 @@ class Handler(object):
 
     # Pide al calculador que verifique si hay matches
     def requestMatches(self):
-        self.__calculador.buscarMatches()
+        return self.__calculador.buscarMatches()
