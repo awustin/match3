@@ -2,8 +2,6 @@
 # Celdas de 50x50 (8x8 celdas)
 import pygame
 from pygame import Surface
-from pygame import Rect
-from pygame import draw
 from pygame import gfxdraw
 from handler import Handler
 from celda import Celda
@@ -21,6 +19,7 @@ class Tablero:
         self.__rect = self.__surf.get_rect()
         self.handler = Handler(N_CELDAS)
         self.__completa = False
+        self.__matches = False
 
     def inicializarCruadricula(self):
         color_base = ([])
@@ -36,14 +35,12 @@ class Tablero:
                 x = x0 + X_CELDA*col
                 color_base = (color_base[0] + 1, color_base[1] + row,
                               color_base[2] + 1*col)
-                print(color_base)
                 colorij = pygame.Color(*color_base)
                 celdaij = Celda(X_CELDA, X_CELDA, colorij)
                 celdaij.setPosicionCentro(x, y)
                 celdaij.setOffsetAbs(self.__pos[0], self.__pos[1])
                 pygame.draw.rect(self.__surf, celdaij.getColor(),
                                  celdaij.getRect())
-                print(celdaij.getPosicionCentro())
                 self.__celdas[row].append(celdaij)
 
     def dibujarFormas(self):
@@ -69,6 +66,8 @@ class Tablero:
         limpiar = False
         dentroCuadricula = False
         for row in range(N_CELDAS):
+            if(limpiar):
+                break
             for col in range(N_CELDAS):
                 celda = self.__celdas[row][col]
                 if(celda.esClickeada(x, y)):
@@ -80,12 +79,12 @@ class Tablero:
                         celda.deseleccionarFicha()
                     if(estadoFicha['swap']):
                         limpiar = True
-                        print("swapping")
                         break
                     color = celda.getColorFicha()
-                    print("Seleccionada: %s en %d, %d" % (celda.
-                                                          getSeleccionada(),
-                                                          row, col))
+                    print("Seleccionada: %d, %d" % (row, col))
+                    gfxdraw.aacircle(self.__surf,
+                                     *celda.getPosicionCentro(),
+                                     15, color)
                     gfxdraw.filled_circle(self.__surf,
                                           *celda.getPosicionCentro(),
                                           15, color)
@@ -93,32 +92,36 @@ class Tablero:
         if(not dentroCuadricula):
             print("Fuera del tablero")
         if(limpiar):
-            fichas = self.handler.requestFichas()
-            print(fichas)
-            self.handler.limpiarSeleccion()
-            for row in range(N_CELDAS):
-                for col in range(N_CELDAS):
-                    celda = self.__celdas[row][col]
-                    celda.setFicha(fichas[row][col])
-                    celda.deseleccionarFicha()
-                    color = celda.getColorFicha()
-                    gfxdraw.filled_circle(self.__surf,
-                                          *celda.getPosicionCentro(),
-                                          15, color)
+            self.limpiarTablero()
 
-    def reiniciarSeleccionFichas(self):
+    def limpiarTablero(self):
+        fichas = self.handler.requestFichas()
+        self.handler.limpiarSeleccion()
         for row in range(N_CELDAS):
             for col in range(N_CELDAS):
                 celda = self.__celdas[row][col]
-                if(celda.getSeleccionada()):
-                    celda.deseleccionarFicha()
-                    color = celda.getColorFicha()
-                    gfxdraw.filled_circle(self.__surf,
-                                          *celda.getPosicionCentro(),
-                                          15, color)
+                celda.setFicha(fichas[row][col])
+                celda.deseleccionarFicha()
+                color = celda.getColorFicha()
+                gfxdraw.aacircle(self.__surf,
+                                 *celda.getPosicionCentro(),
+                                 15, color)
+                gfxdraw.filled_circle(self.__surf,
+                                      *celda.getPosicionCentro(),
+                                      15, color)
+        self.__matches = False
+    
+    # Metodo que pregunta al calculador si hay matches
+    def verificarMatches(self):
+        if(not self.__matches):
+            self.handler.requestMatches()
+            self.__matches = True
 
     def setCompleto(self, completo):
-        self.__completa = False
+        self.__completa = completo
+
+    def setMatches(self, matches):
+        self.__matches = matches
 
     def getSurface(self):
         return self.__surf

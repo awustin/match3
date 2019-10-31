@@ -66,7 +66,9 @@ class App:
                         return
                     if(evento.key == pygame.K_r):
                         self.tablero.setCompleto(False)
+                        self.tablero.setMatches(False)
                         colorPpal = (random()*255, random()*255, random()*255)
+                        print("Recargando tablero...")
                 if(evento.type == pygame.MOUSEBUTTONDOWN):
                     if(mouse.get_pressed()[0] == 1):
                         infoXY = Texto(mouse.get_pos(), globales.FONT_INFO,
@@ -77,6 +79,7 @@ class App:
             self.pantalla.dibujar(self.tablero.getSurface(),
                                   self.tablero.getPosicion())
             self.tablero.dibujarFormas()
+            self.tablero.verificarMatches()
             if(mostrarInfo):
                 self.pantalla.dibujar(infoXY.getSurface(), (0, 0))
             pygame.display.update()

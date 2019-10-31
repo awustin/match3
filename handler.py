@@ -29,3 +29,7 @@ class Handler(object):
     def estaSeleccionada(self, x, y):
         seleccionada = self.__calculador.estaEnLaSeleccion(x, y)
         return seleccionada
+
+    # Pide al calculador que verifique si hay matches
+    def requestMatches(self):
+        self.__calculador.buscarMatches()

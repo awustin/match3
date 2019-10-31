@@ -40,7 +40,7 @@ class Calculador(object):
         elif(len(fichasSeleccionadas) == 1):
             primerItem = fichasSeleccionadas[0]
             if(primerItem != (x, y)):
-                print("Swapping...")
+                print("Swapping: [%d, %d] con [%d, %d]" % (x, y, *primerItem))
                 self.swapFichas(*primerItem, *(x, y))
                 estado['swap'] = True
             else:
@@ -51,7 +51,6 @@ class Calculador(object):
             print("Hay mas de 2 fichas seleccionadas")
             estado['seleccionada'] = False
             self.limpiarFichasSeleccionadas()
-        print(fichasSeleccionadas)
 
     def agregarFichaSeleccionada(self, x, y):
         self.__fichasSeleccionadas.append((x, y))
@@ -72,3 +71,30 @@ class Calculador(object):
             if((x, y) == ficha):
                 seleccionada = True
         return seleccionada
+
+    def buscarMatches(self):
+        fichas = self.__fichas
+        alineadas = []
+        horizontal = []
+        vertical = []
+        for row in range(len(fichas)):
+            if(len(horizontal) > 2):
+                print("FILA %d, Alineacion de %d" % (row-1, len(horizontal)))
+                print(alineadas)
+            horizontal = []
+            alineadas = []
+            for col in range(len(fichas[row])):
+                candidato = fichas[row][col]
+                if(col == 0):
+                    horizontal.append(candidato)
+                    alineadas.append((row, col))
+                    continue
+                if((horizontal[0] - candidato) != 0):
+                    if(len(horizontal) > 2):
+                        print("FILA %d, Alineacion de %d" % (row, len(horizontal)))
+                        print(alineadas)
+                    horizontal = []
+                    alineadas = []
+                horizontal.append(candidato)
+                alineadas.append((row, col))
+
