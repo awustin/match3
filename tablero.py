@@ -17,9 +17,14 @@ class Tablero:
         self.__tam = tam
         self.__surf = Surface(self.__tam)
         self.__rect = self.__surf.get_rect()
+        self.__fichas = []
+        self.__celdas = []
         self.handler = Handler(N_CELDAS)
         self.__completa = False
         self.__matches = False
+
+    def generarFichasRan(self):
+        self.__fichas = self.handler.fichasRan()
 
     def inicializarCruadricula(self):
         color_base = ([])

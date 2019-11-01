@@ -16,6 +16,21 @@ class Calculador(object):
             for col in range(n):
                 self.__fichas[row].append(0)
 
+    def setFichasRan(self, n):
+        for row in range(n):
+            self.__fichas.append([])
+            for col in range(n):
+                ran = random()
+                if(ran > 0 and ran <= 0.25):
+                    ficha = 1
+                elif(ran > 0.25 and ran <= 0.5):
+                    ficha = 2
+                elif(ran > 0.5 and ran <= 0.75):
+                    ficha = 3
+                else:
+                    ficha = 4
+                self.__fichas[row].append(ficha)
+
     def getFichaXY(self, x, y):
         ran = random()
         if(ran > 0 and ran <= 0.25):

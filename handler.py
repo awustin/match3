@@ -8,6 +8,10 @@ class Handler(object):
         print("Handler")
         self.__calculador = Calculador(tamanio)
 
+    def fichasRan(self):
+        self.__calculador.setFichasRan()
+        return self.__calculador.getFichas
+
     def requestFicha(self, x, y):
         # Pide la ficha para la posicion x, y
         # Devuelve una response
