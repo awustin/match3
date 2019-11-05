@@ -2,82 +2,161 @@
 # Celdas de 50x50 (8x8 celdas)
 import pygame
 from pygame import Surface
+from pygame import Rect
+from pygame import draw
 from pygame import gfxdraw
 from handler import Handler
 from celda import Celda
+import globales
 
 
 X_CUAD = 480
+Y_CUAD = X_CUAD
+X_OFF = (globales.DIMENSION[0] - X_CUAD) / 2
+Y_OFF = (globales.DIMENSION[1] - Y_CUAD) / 2
 N_CELDAS = 8
 X_CELDA = X_CUAD/N_CELDAS
 
 
 class Tablero:
-    def __init__(self, tam=(X_CUAD, X_CUAD), color=(1, 1, 1, 1)):
+    def __init__(self, tam=(X_CUAD, X_CUAD), color=(1, 1, 1)):
         self.__tam = tam
         self.__surf = Surface(self.__tam)
         self.__rect = self.__surf.get_rect()
+        self.__color_base = color
         self.__fichas = []
         self.__celdas = []
+        self.__celdasEstanCompletas = False
         self.handler = Handler(N_CELDAS)
-        self.__completa = False
+        self.__actualizado = False
         self.__matches = False
 
-    def generarFichasRan(self):
-        self.__fichas = self.handler.fichasRan()
-
-    def inicializarCruadricula(self):
-        color_base = ([])
+    def setCompleto(self, completo):
+        '''Asigna valor a la bandera para ver si
+        se debe actualizar la matriz de celdas o no.
+        Si está completo (se dibujaron todas las celdas):
+        no se reinicia la matriz de celdas.
+        Si hubo cambios en las celdas (p ejemplo, al reiniciar
+        el tablero):
+        se reinicia la matriz de celdas'''
+        self.__celdasEstanCompletas = completo
+        
+    def setMatches(self, matches):
+        '''Asigna valor a la bandera para ver si
+        se encontraron alineaciones'''
+        self.__matches = matches
+        
+    def reiniciarMatrizCeldas(self):
+        self.__celdas.clear()
         self.__celdas = []
-        self.__pivot = (X_CELDA/2, X_CELDA/2)
-        x0 = self.__pivot[0]
-        y0 = self.__pivot[1]
-        color_base = (50, 0, 20)
-        for row in (range(N_CELDAS)):
-            self.__celdas.append([])
-            y = y0 + X_CELDA*row
-            for col in (range(N_CELDAS)):
-                x = x0 + X_CELDA*col
-                color_base = (color_base[0] + 1, color_base[1] + row,
-                              color_base[2] + 1*col)
-                colorij = pygame.Color(*color_base)
-                celdaij = Celda(X_CELDA, X_CELDA, colorij)
-                celdaij.setPosicionCentro(x, y)
-                celdaij.setOffsetAbs(self.__pos[0], self.__pos[1])
-                pygame.draw.rect(self.__surf, celdaij.getColor(),
-                                 celdaij.getRect())
-                self.__celdas[row].append(celdaij)
 
-    def dibujarFormas(self):
-        # En el Calculador: Se registra qué ficha va en la matriz
-        if(not self.__completa):
-            self.handler.limpiarSeleccion()
-            for row in range(N_CELDAS):
-                for col in range(N_CELDAS):
-                    ficha = self.handler.requestFicha(row, col)
-                    celda = self.__celdas[row][col]
-                    celda.setFicha(ficha)
-                    celda.deseleccionarFicha()
-                    color = celda.getColorFicha()
-                    gfxdraw.aacircle(self.__surf,
-                                     *celda.getPosicionCentro(),
-                                     15, color)
-                    gfxdraw.filled_circle(self.__surf,
-                                          *celda.getPosicionCentro(),
-                                          15, color)
-        self.__completa = True
+    def generarFichasRan(self):
+        self.__fichas = self.handler.requestFichasRan(N_CELDAS)
 
+    def gradiente(self, color):
+        difr = 10
+        difg = 10
+        difb = 15
+        if(difr + color[0] > 255):
+            difr = -100
+        if(difg + color[1] > 255):
+            difg = -100
+        if(difb + color[2] > 255):
+            difb = -100
+        r = color[0] + difr
+        g = color[1] + difg
+        b = color[2] + difb
+        return (r, g, b)
+
+    def actualizarTablero(self, ventana, x_celda, x_espaciado, color_base,
+                          fichas):
+        '''Actualiza el tablero.
+        Si no está completo (no se dibujaron todas las celdas),
+        se crean instancias de Celda.
+        Si está completo (ya se dibujaron todas las celdas),
+        recorre la matriz de celdas en busca de cambios de 
+        estado.
+        ventana es una Surface
+        x_celda el tamaño de la celda cuadrada.
+        x_espaciado es el espaciado entre las celdas.
+        color_base es el color de la celda
+        fichas es la matriz (entera) de fichas'''
+        color = color_base
+        if(not self.__celdasEstanCompletas):
+            for row in range(len(fichas)):
+                self.__celdas.append([])
+                for col in range(len(fichas[row])):
+                    color = self.gradiente(color)
+                    celda = Celda(x_celda, x_celda, col*(x_celda+x_espaciado) +
+                                  X_OFF, row*(x_celda+x_espaciado) + Y_OFF,
+                                  color)
+                    celda.setFicha(fichas[row][col])
+                    celda.setColorCelda(color)
+                    centro = celda.getPosicionCentro()
+                    rect = celda.getRect()
+                    draw.rect(ventana, color, rect)
+                    gfxdraw.aacircle(ventana, *centro, 15,
+                                     celda.getColorFicha())
+                    gfxdraw.filled_circle(ventana, *centro, 10,
+                                          celda.getColorFicha())
+                    self.__celdas[row].append(celda)
+                    if(row == len(fichas)-1 and col == len(fichas[row])-1):
+                        self.setCompleto(True)
+        else:
+            celdas = self.__celdas
+            for row in range(len(celdas)):
+                for col in range(len(celdas[row])):
+                    celda = celdas[row][col]
+                    celda.setFicha(fichas[row][col])
+                    centro = celda.getPosicionCentro()
+                    draw.rect(ventana, celda.getColorCelda(), celda.getRect())
+                    gfxdraw.aacircle(ventana, *centro, 15,
+                                     celda.getColorFicha())
+                    gfxdraw.filled_circle(ventana, *centro, 10,
+                                          celda.getColorFicha())
+
+    def actualizarTableroConEstado(self, ventana):
+        ''' Actualiza el tablero, segun el estado de las fichas
+        y las alineaciones.
+        El programa principal debe llamar a esta función en cada iteración'''
+        fichas = self.handler.requestFichas()
+        if(len(fichas) == 0):
+            self.handler.requestFichasRan(N_CELDAS)
+            fichas = self.__fichas
+        color_base = self.__color_base
+        self.actualizarTablero(ventana, X_CELDA, 5, color_base, fichas)
+
+    def deseleccionarTodasCeldas(self):
+        '''Recorre la matriz de celdas y deselecciona
+        una por una'''
+        for row in range(len(self.__celdas)):
+            for col in range(len(self.__celdas[row])):
+                celda = self.__celdas[row][col]
+                celda.deseleccionarFicha()
+
+    def limpiarSeleccionCeldas(self):
+        '''Vacia la lista de seleccionadas en el calculador \n
+        Deselecciona todas las celdas del tablero \n
+        Setea el valor de 'matches' a False'''
+        self.handler.limpiarSeleccion()
+        self.deseleccionarTodasCeldas()
+        self.__matches = False
+    
     def clickXY(self, x, y):
+        '''Busca cuál fue la casilla clickeada
+        y dispara la lógica de selección de las fichas'''
         limpiar = False
         dentroCuadricula = False
-        for row in range(N_CELDAS):
+        fichas = self.handler.requestFichas()
+        for row in range(len(fichas)):
             if(limpiar):
                 break
-            for col in range(N_CELDAS):
+            for col in range(len(fichas[row])):
                 celda = self.__celdas[row][col]
                 if(celda.esClickeada(x, y)):
                     dentroCuadricula = True
-                    estadoFicha = self.handler.clickSeleccionXY(row, col)
+                    print(f'Se clickeó la celda {(row, col)}')
+                    estadoFicha = self.handler.seleccionFichasYEstado(row, col)
                     if(estadoFicha['seleccionada']):
                         celda.seleccionarFicha()
                     else:
@@ -85,39 +164,15 @@ class Tablero:
                     if(estadoFicha['swap']):
                         limpiar = True
                         break
-                    color = celda.getColorFicha()
-                    print("Seleccionada: %d, %d" % (row, col))
-                    gfxdraw.aacircle(self.__surf,
-                                     *celda.getPosicionCentro(),
-                                     15, color)
-                    gfxdraw.filled_circle(self.__surf,
-                                          *celda.getPosicionCentro(),
-                                          15, color)
                     break
         if(not dentroCuadricula):
             print("Fuera del tablero")
         if(limpiar):
-            self.limpiarTablero()
+            self.limpiarSeleccionCeldas()
 
-    def limpiarTablero(self):
-        fichas = self.handler.requestFichas()
-        self.handler.limpiarSeleccion()
-        for row in range(N_CELDAS):
-            for col in range(N_CELDAS):
-                celda = self.__celdas[row][col]
-                celda.setFicha(fichas[row][col])
-                celda.deseleccionarFicha()
-                color = celda.getColorFicha()
-                gfxdraw.aacircle(self.__surf,
-                                 *celda.getPosicionCentro(),
-                                 15, color)
-                gfxdraw.filled_circle(self.__surf,
-                                      *celda.getPosicionCentro(),
-                                      15, color)
-        self.__matches = False
-    
     # Metodo que pregunta al calculador si hay matches
     def verificarMatches(self):
+        '''TODO: refactorear este metodo'''
         celdas = self.__celdas
         alineaciones = []
         if(not self.__matches):
@@ -135,26 +190,3 @@ class Tablero:
                 fin = celdas[x2][y2].getPosicionCentro()
                 color = (255, 255, 255)
                 gfxdraw.hline(self.__surf, inicio[0], fin[0], inicio[1], color)
-
-
-    def setCompleto(self, completo):
-        self.__completa = completo
-
-    def setMatches(self, matches):
-        self.__matches = matches
-
-    def getSurface(self):
-        return self.__surf
-
-    def setPosicionOffset(self, x, y):
-        self.__pos = (x, y)
-        self.__rect.center = (x+self.__tam[0]/2, y+self.__tam[1]/2)
-
-    def getPosicion(self):
-        return self.__pos
-
-    def getCeldas(self):
-        return self.__celdas
-
-    def getPosicionCeldas(self):
-        return self.__centCeldas

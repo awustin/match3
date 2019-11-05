@@ -1,11 +1,12 @@
 # Celda
 from pygame import Rect
+from pygame import Surface
 
 
 class Celda(object):
 
-    def __init__(self, x, y, color=(10, 10, 10)):
-        self.__rect = Rect(0, 0, x, y)
+    def __init__(self, x, y, posx=0, posy=0, color=(10, 10, 10)):
+        self.__rect = Rect(posx, posy, x, y)
         self.__color = color
         self.__colorSeleccionada = color
         self.__seleccionada = False
@@ -30,22 +31,19 @@ class Celda(object):
             self.seleccionarFicha()
 
     def getColorFicha(self):
+        '''En el momento de devolver el color de la ficha,
+        retorna el color original si No está seleccionada,
+        retorna el color oscuro si está seleccionada'''
         if(self.__seleccionada):
             return self.__fichaColorSeleccionada
         else:
             return self.__fichaColor
 
-    def setColor(self, color):
+    def setColorCelda(self, color):
         self.__color = color
 
-    def getColor(self):
+    def getColorCelda(self):
         return self.__color
-
-    def setColorSeleccionada(self, color):
-        self.__colorSeleccionada = color
-
-    def getColorSeleccionada(self):
-        return self.__colorSeleccionada
 
     def getRect(self):
         return self.__rect
@@ -62,21 +60,24 @@ class Celda(object):
     def setPosicionCentro(self, x, y):
         self.__rect.center = (x, y)
 
-    def esClickeada(self, x0, y0):
-        x = x0 - self.getOffsetAbs()[0]
-        y = y0 - self.getOffsetAbs()[1]
+    def esClickeada(self, x, y):
+        '''Devuelve True si el Rect correspondiente
+        a esta celda fue clickeado (si collidepoint
+        de pygame retorna True)'''
         return self.__rect.collidepoint(x, y)
 
     def setFicha(self, valor):
         self.__ficha = valor
         if(self.__ficha == 1):
-            self.__fichaColor = (255, 0, 0)
+            self.__fichaColor = (255, 100, 50)
         elif(self.__ficha == 2):
-            self.__fichaColor = (0, 255, 0)
+            self.__fichaColor = (120, 255, 50)
         elif(self.__ficha == 3):
-            self.__fichaColor = (0, 0, 255)
+            self.__fichaColor = (120, 100, 255)
         elif(self.__ficha == 4):
-            self.__fichaColor = (255, 255, 0)
+            self.__fichaColor = (255, 255, 50)
+        else:
+            self.__fichaColor = (255, 255, 255)
 
     def getFicha(self):
         return self.__ficha

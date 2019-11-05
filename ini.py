@@ -10,6 +10,7 @@ import customEnums
 from pantalla import Pantalla
 from texto import Texto
 from tablero import Tablero
+from pygame import Rect
 
 
 class App:
@@ -25,12 +26,7 @@ class App:
         posX = self.pantalla.posicionCentrarX(self.mjeInicio.getSurface())
         posY = self.pantalla.posicionCentrarY(self.mjeInicio.getSurface())
         self.mjeInicio.setPosicion(posX, posY)
-        self.tablero = Tablero()
-        # self.tablero.centrarTablero(self.pantalla.getDisplay())
-        posX = self.pantalla.posicionCentrarX(self.tablero.getSurface())
-        posY = self.pantalla.posicionCentrarY(self.tablero.getSurface())
-        self.tablero.setPosicionOffset(posX, posY)
-        self.tablero.inicializarCruadricula()
+        self.tablero = Tablero(color=(20, 40, 80))
 
     def ejecutar(self):
         clock = time.Clock()
@@ -54,7 +50,7 @@ class App:
     def partida(self):
         gameOver = False
         mostrarInfo = False
-        colorPpal = (100, 200, 100)
+        colorPpal = (120, 100, 50)
         print("Presionó ENTER")
         while(not gameOver):
             for evento in event.get():
@@ -76,10 +72,7 @@ class App:
                         self.tablero.clickXY(*mouse.get_pos())
                         mostrarInfo = True
             self.pantalla.colorFondo(colorPpal)
-            self.pantalla.dibujar(self.tablero.getSurface(),
-                                  self.tablero.getPosicion())
-            self.tablero.dibujarFormas()
-            self.tablero.verificarMatches()
+            self.tablero.actualizarTableroConEstado(self.pantalla.getDisplay())
             if(mostrarInfo):
                 self.pantalla.dibujar(infoXY.getSurface(), (0, 0))
             pygame.display.update()

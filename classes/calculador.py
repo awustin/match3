@@ -8,7 +8,6 @@ class Calculador(object):
         self.__fichas = []
         self.__fichasSeleccionadas = ([])
         # fichasSeleccionadas: maximo dos simultaneamente
-        self.setFichasVacias(tamanio)
 
     def setFichasVacias(self, n):
         for row in range(n):
