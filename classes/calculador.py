@@ -87,6 +87,9 @@ class Calculador(object):
         return seleccionada
 
     def buscarMatches(self):
+        '''Devuelve una tupla de dos listas:\n
+            alineaciones horizontales\n
+            alineaciones verticales\n'''
         alineacionesH = self.__buscarHorizontales()
         alineacionesV = self.__buscarVerticales()
         return (alineacionesH, alineacionesV)

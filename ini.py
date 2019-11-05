@@ -10,7 +10,6 @@ import customEnums
 from pantalla import Pantalla
 from texto import Texto
 from tablero import Tablero
-from pygame import Rect
 
 
 class App:
@@ -56,13 +55,13 @@ class App:
             for evento in event.get():
                 if(evento.type == pygame.QUIT):
                     gameOver = True
-                    sys.exit()
+                    pygame.quit()
+                    quit()
                 if(evento.type == pygame.KEYDOWN):
                     if(evento.key == pygame.K_a):
                         return
                     if(evento.key == pygame.K_r):
-                        self.tablero.setCompleto(False)
-                        self.tablero.setMatches(False)
+                        self.tablero.reiniciaFichasCeldasTablero()
                         colorPpal = (random()*255, random()*255, random()*255)
                         print("Recargando tablero...")
                 if(evento.type == pygame.MOUSEBUTTONDOWN):
@@ -72,6 +71,7 @@ class App:
                         self.tablero.clickXY(*mouse.get_pos())
                         mostrarInfo = True
             self.pantalla.colorFondo(colorPpal)
+            #self.tablero.verificarMatches(self.pantalla.getDisplay())
             self.tablero.actualizarTableroConEstado(self.pantalla.getDisplay())
             if(mostrarInfo):
                 self.pantalla.dibujar(infoXY.getSurface(), (0, 0))

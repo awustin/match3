@@ -37,10 +37,7 @@ class Handler(object):
         self.__calculador.logicaSeleccionFichas(x, y, estadoFicha)
         return estadoFicha
 
-    def estaSeleccionada(self, x, y):
-        seleccionada = self.__calculador.estaEnLaSeleccion(x, y)
-        return seleccionada
-
-    # Pide al calculador que verifique si hay matches
     def requestMatches(self):
+        '''Pide al calculador que verifique si hay
+        alineaciones'''
         return self.__calculador.buscarMatches()

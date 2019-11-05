@@ -1,12 +1,11 @@
 # Tablero
 # Celdas de 50x50 (8x8 celdas)
-import pygame
 from pygame import Surface
-from pygame import Rect
 from pygame import draw
 from pygame import gfxdraw
 from handler import Handler
 from celda import Celda
+from random import random
 import globales
 
 
@@ -40,18 +39,31 @@ class Tablero:
         el tablero):
         se reinicia la matriz de celdas'''
         self.__celdasEstanCompletas = completo
-        
+
     def setMatches(self, matches):
         '''Asigna valor a la bandera para ver si
         se encontraron alineaciones'''
         self.__matches = matches
-        
+
     def reiniciarMatrizCeldas(self):
         self.__celdas.clear()
         self.__celdas = []
 
+    def reiniciarMatrizFichas(self):
+        self.__fichas.clear()
+
     def generarFichasRan(self):
         self.__fichas = self.handler.requestFichasRan(N_CELDAS)
+
+    def reiniciaFichasCeldasTablero(self):
+        '''Vacia la matriz de celdas,
+        Vacia la matriz de fichas
+        Pone las banderas en su estado inicial'''
+        self.reiniciarMatrizCeldas()
+        self.reiniciarMatrizFichas()
+        self.setCompleto(False)
+        self.setMatches(False)
+        self.__color_base = (random()*255, random()*255, random()*255)
 
     def gradiente(self, color):
         difr = 10
@@ -114,6 +126,7 @@ class Tablero:
                                      celda.getColorFicha())
                     gfxdraw.filled_circle(ventana, *centro, 10,
                                           celda.getColorFicha())
+        self.verificarMatches(ventana)
 
     def actualizarTableroConEstado(self, ventana):
         ''' Actualiza el tablero, segun el estado de las fichas
@@ -121,8 +134,8 @@ class Tablero:
         El programa principal debe llamar a esta función en cada iteración'''
         fichas = self.handler.requestFichas()
         if(len(fichas) == 0):
-            self.handler.requestFichasRan(N_CELDAS)
-            fichas = self.__fichas
+            self.__fichas = self.handler.requestFichasRan(N_CELDAS)
+            fichas = self.__fichas 
         color_base = self.__color_base
         self.actualizarTablero(ventana, X_CELDA, 5, color_base, fichas)
 
@@ -141,7 +154,7 @@ class Tablero:
         self.handler.limpiarSeleccion()
         self.deseleccionarTodasCeldas()
         self.__matches = False
-    
+
     def clickXY(self, x, y):
         '''Busca cuál fue la casilla clickeada
         y dispara la lógica de selección de las fichas'''
@@ -170,14 +183,14 @@ class Tablero:
         if(limpiar):
             self.limpiarSeleccionCeldas()
 
-    # Metodo que pregunta al calculador si hay matches
-    def verificarMatches(self):
-        '''TODO: refactorear este metodo'''
+    def verificarMatches(self, ventana):
+        '''Verifica la existencia de alineaciones\n
+        a partir de 3 fichas'''
         celdas = self.__celdas
         alineaciones = []
         if(not self.__matches):
             alineaciones = self.handler.requestMatches()
-            self.__matches = True
+            self.setMatches(True)
         if(len(alineaciones) != 0):
             for hor in alineaciones[0]:
                 celdaini = hor[0]
@@ -189,4 +202,4 @@ class Tablero:
                 inicio = celdas[x1][y1].getPosicionCentro()
                 fin = celdas[x2][y2].getPosicionCentro()
                 color = (255, 255, 255)
-                gfxdraw.hline(self.__surf, inicio[0], fin[0], inicio[1], color)
+                gfxdraw.hline(ventana, inicio[0], fin[0], inicio[1], color)
