@@ -72,6 +72,10 @@ class Calculador(object):
     def limpiarFichasSeleccionadas(self):
         self.__fichasSeleccionadas = ([])
 
+    def vaciarMatrizFichasEnteros(self):
+        self.__fichas.clear()
+        self.__fichas = []
+
     def swapFichas(self, x1, y1, x2, y2):
         fichas = self.__fichas
         aux = fichas[x1][y1]

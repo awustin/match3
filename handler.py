@@ -82,3 +82,7 @@ class Handler(object):
         '''Pide al calculador que verifique si hay
         alineaciones'''
         return self.__calculador.buscarMatches()
+
+    def reiniciarCalculador(self):
+        self.__calculador.limpiarFichasSeleccionadas()
+        self.__calculador.vaciarMatrizFichasEnteros()

@@ -20,7 +20,7 @@ class Tablero:
     def __init__(self, tam=(X_CUAD, X_CUAD), color=(1, 1, 1)):
         self.handler = Handler(N_CELDAS)
         self.__color_base = color
-        self.__fichas = []
+        #self.__fichas = []
         self.__celdas = []
         self.__celdasEstanCompletas = False
         self.__actualizado = False
@@ -48,15 +48,20 @@ class Tablero:
     def reiniciarMatrizFichas(self):
         self.__fichas.clear()
 
-    def generarFichasRan(self):
-        self.__fichas = self.handler.requestFichasRan(N_CELDAS)
+    def reiniciarCalculador(self):
+        '''Reinicia el calculador:\n
+        Vacia la lista de alineadas\n
+        Vacia la lista de seleccion\n
+        Recarga una matriz de enteros random\n'''
+        self.handler.reiniciarCalculador()
 
     def reiniciaFichasCeldasTablero(self):
-        '''Vacia la matriz de celdas,
-        Vacia la matriz de fichas
+        '''Vacía la matriz de celdas,\n
+        Vacía la matriz de fichas\n
         Pone las banderas en su estado inicial'''
         self.reiniciarMatrizCeldas()
-        self.reiniciarMatrizFichas()
+        #self.reiniciarMatrizFichas()
+        self.reiniciarCalculador()
         self.setCompleto(False)
         self.setMatches(False)
         self.__color_base = (random()*255, random()*255, random()*255)
