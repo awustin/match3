@@ -71,7 +71,6 @@ class App:
                         self.tablero.clickXY(*mouse.get_pos())
                         mostrarInfo = True
             self.pantalla.colorFondo(colorPpal)
-            #self.tablero.verificarMatches(self.pantalla.getDisplay())
             self.tablero.actualizarTableroConEstado(self.pantalla.getDisplay())
             if(mostrarInfo):
                 self.pantalla.dibujar(infoXY.getSurface(), (0, 0))

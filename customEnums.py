@@ -9,9 +9,11 @@ class TipoTexto(Enum):
     TITULO = 2
 
 
-class TipoFicha(Enum):
-    NO_ESPECIFICADO = 0
-    CIRCULO_AM = 1
-    CIRCULO_AZ = 2
-    CIRCULO_R = 3
-    CIRCULO_V = 4
+class Colores(Enum):
+    GRIS = (50, 50, 50)
+    ROJO = (255, 56, 56)
+    AZUL = (27, 61, 109)
+    VERDE = (54, 175, 64)
+    AMARILLO = (255, 184, 53)
+    SELECCION = (0, 21, 20)
+    ALINEACION = (251, 255, 241)

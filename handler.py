@@ -1,11 +1,13 @@
 # Handler
 from classes.calculador import Calculador
+from ficha import Ficha
 
 
 class Handler(object):
 
     def __init__(self, tamanio):
         print("Handler")
+        self.__fichas = []
         self.__calculador = Calculador(tamanio)
 
     def requestFichasRan(self, n):
@@ -14,8 +16,47 @@ class Handler(object):
         self.__calculador.setFichasRan(n)
         return self.__calculador.getFichas()
 
-    def requestFichas(self):
-        return self.__calculador.getFichas()
+    def requestFichas(self, n=0):
+        '''Pide al calculador la matriz (int) de fichas\n
+        Instancia una Ficha por cada elemento,\n
+        si cambió la ficha\n
+        Devuelve una matriz de Fichas'''
+        enteros = self.__calculador.getFichas()
+        if(len(enteros) == 0):
+            # Es la primera vez que se carga la matriz de fichas
+            # Se asigna a "enterosAnterior"
+            # Se instancia cada ficha
+            enteros = self.requestFichasRan(n)
+            self.__enterosAnterior = enteros
+            fichas = []
+            for row in range(len(enteros)):
+                fichas.append([])
+                for col in range(len(enteros[row])):
+                    idTipo = enteros[row][col]
+                    ficha = Ficha(idTipo)
+                    fichas[row].append(ficha)
+            self.__fichas = fichas
+            return self.__fichas
+        else:
+            # El calculador ya tiene fichas (enteros) cargadas
+            # El handler ya tiene matriz de fichas
+            # En un nuevo arreglo, se copia el mismo objeto
+            # A menos que haya un cambio.
+            # En ese caso, se instancia uno nuevo
+            fichasAnterior = self.__fichas
+            fichasNuevas = []
+            for row in range(len(enteros)):
+                fichasNuevas.append([])
+                for col in range(len(enteros[row])):
+                    tipoAnterior = fichasAnterior[row][col].getTipoInt()
+                    if(tipoAnterior == enteros[row][col]):
+                        ficha = fichasAnterior[row][col]
+                    else:
+                        tipoNuevo = enteros[row][col]
+                        ficha = Ficha(tipoNuevo)
+                    fichasNuevas[row].append(ficha)
+            self.__fichas = fichasNuevas
+            return self.__fichas
 
     def requestFicha(self, x, y):
         # Pide la ficha para la posicion x, y

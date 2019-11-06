@@ -1,6 +1,5 @@
 # Tablero
 # Celdas de 50x50 (8x8 celdas)
-from pygame import Surface
 from pygame import draw
 from pygame import gfxdraw
 from handler import Handler
@@ -19,14 +18,11 @@ X_CELDA = X_CUAD/N_CELDAS
 
 class Tablero:
     def __init__(self, tam=(X_CUAD, X_CUAD), color=(1, 1, 1)):
-        self.__tam = tam
-        self.__surf = Surface(self.__tam)
-        self.__rect = self.__surf.get_rect()
+        self.handler = Handler(N_CELDAS)
         self.__color_base = color
         self.__fichas = []
         self.__celdas = []
         self.__celdasEstanCompletas = False
-        self.handler = Handler(N_CELDAS)
         self.__actualizado = False
         self.__matches = False
 
@@ -66,15 +62,15 @@ class Tablero:
         self.__color_base = (random()*255, random()*255, random()*255)
 
     def gradiente(self, color):
-        difr = 10
-        difg = 10
-        difb = 15
+        difr = 50*random()
+        difg = 50*random()
+        difb = 50*random()
         if(difr + color[0] > 255):
-            difr = -100
+            difr = -50
         if(difg + color[1] > 255):
-            difg = -100
+            difg = -50
         if(difb + color[2] > 255):
-            difb = -100
+            difb = -50
         r = color[0] + difr
         g = color[1] + difg
         b = color[2] + difb
@@ -92,7 +88,7 @@ class Tablero:
         x_celda el tamaño de la celda cuadrada.
         x_espaciado es el espaciado entre las celdas.
         color_base es el color de la celda
-        fichas es la matriz (entera) de fichas'''
+        fichas es la matriz (objetos) de fichas'''
         color = color_base
         if(not self.__celdasEstanCompletas):
             for row in range(len(fichas)):
@@ -102,15 +98,14 @@ class Tablero:
                     celda = Celda(x_celda, x_celda, col*(x_celda+x_espaciado) +
                                   X_OFF, row*(x_celda+x_espaciado) + Y_OFF,
                                   color)
-                    celda.setFicha(fichas[row][col])
+                    celda.setFicha2(ficha=fichas[row][col])
                     celda.setColorCelda(color)
                     centro = celda.getPosicionCentro()
                     rect = celda.getRect()
                     draw.rect(ventana, color, rect)
-                    gfxdraw.aacircle(ventana, *centro, 15,
-                                     celda.getColorFicha())
-                    gfxdraw.filled_circle(ventana, *centro, 10,
-                                          celda.getColorFicha())
+                    colorFicha = fichas[row][col].getColor()
+                    gfxdraw.aacircle(ventana, *centro, 15, colorFicha)
+                    gfxdraw.filled_circle(ventana, *centro, 10, colorFicha)
                     self.__celdas[row].append(celda)
                     if(row == len(fichas)-1 and col == len(fichas[row])-1):
                         self.setCompleto(True)
@@ -119,23 +114,20 @@ class Tablero:
             for row in range(len(celdas)):
                 for col in range(len(celdas[row])):
                     celda = celdas[row][col]
-                    celda.setFicha(fichas[row][col])
+                    if(not celda.getFicha2().equals(fichas[row][col])):
+                        celda.setFicha2(fichas[row][col].getTipoInt())
                     centro = celda.getPosicionCentro()
+                    colorFicha = celda.getColorFicha2()
                     draw.rect(ventana, celda.getColorCelda(), celda.getRect())
-                    gfxdraw.aacircle(ventana, *centro, 15,
-                                     celda.getColorFicha())
-                    gfxdraw.filled_circle(ventana, *centro, 10,
-                                          celda.getColorFicha())
+                    gfxdraw.aacircle(ventana, *centro, 15, colorFicha)
+                    gfxdraw.filled_circle(ventana, *centro, 10, colorFicha)
         self.verificarMatches(ventana)
 
     def actualizarTableroConEstado(self, ventana):
         ''' Actualiza el tablero, segun el estado de las fichas
         y las alineaciones.
         El programa principal debe llamar a esta función en cada iteración'''
-        fichas = self.handler.requestFichas()
-        if(len(fichas) == 0):
-            self.__fichas = self.handler.requestFichasRan(N_CELDAS)
-            fichas = self.__fichas 
+        fichas = self.handler.requestFichas(N_CELDAS)
         color_base = self.__color_base
         self.actualizarTablero(ventana, X_CELDA, 5, color_base, fichas)
 
@@ -145,7 +137,7 @@ class Tablero:
         for row in range(len(self.__celdas)):
             for col in range(len(self.__celdas[row])):
                 celda = self.__celdas[row][col]
-                celda.deseleccionarFicha()
+                celda.deseleccionarFicha2()
 
     def limpiarSeleccionCeldas(self):
         '''Vacia la lista de seleccionadas en el calculador \n
@@ -160,7 +152,7 @@ class Tablero:
         y dispara la lógica de selección de las fichas'''
         limpiar = False
         dentroCuadricula = False
-        fichas = self.handler.requestFichas()
+        fichas = self.handler.requestFichas(N_CELDAS)
         for row in range(len(fichas)):
             if(limpiar):
                 break
@@ -171,9 +163,9 @@ class Tablero:
                     print(f'Se clickeó la celda {(row, col)}')
                     estadoFicha = self.handler.seleccionFichasYEstado(row, col)
                     if(estadoFicha['seleccionada']):
-                        celda.seleccionarFicha()
+                        celda.seleccionarFicha2()
                     else:
-                        celda.deseleccionarFicha()
+                        celda.deseleccionarFicha2()
                     if(estadoFicha['swap']):
                         limpiar = True
                         break
@@ -193,13 +185,5 @@ class Tablero:
             self.setMatches(True)
         if(len(alineaciones) != 0):
             for hor in alineaciones[0]:
-                celdaini = hor[0]
-                x1 = celdaini[0]
-                y1 = celdaini[1]
-                celdafin = hor[len(hor)-1]
-                x2 = celdafin[0]
-                y2 = celdafin[1]
-                inicio = celdas[x1][y1].getPosicionCentro()
-                fin = celdas[x2][y2].getPosicionCentro()
-                color = (255, 255, 255)
-                gfxdraw.hline(ventana, inicio[0], fin[0], inicio[1], color)
+                pass
+            # TODO: ALINEADAS
