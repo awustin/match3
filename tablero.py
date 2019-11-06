@@ -20,10 +20,8 @@ class Tablero:
     def __init__(self, tam=(X_CUAD, X_CUAD), color=(1, 1, 1)):
         self.handler = Handler(N_CELDAS)
         self.__color_base = color
-        #self.__fichas = []
         self.__celdas = []
         self.__celdasEstanCompletas = False
-        self.__actualizado = False
         self.__matches = False
 
     def setCompleto(self, completo):
@@ -60,7 +58,6 @@ class Tablero:
         Vacía la matriz de fichas\n
         Pone las banderas en su estado inicial'''
         self.reiniciarMatrizCeldas()
-        #self.reiniciarMatrizFichas()
         self.reiniciarCalculador()
         self.setCompleto(False)
         self.setMatches(False)
@@ -189,6 +186,14 @@ class Tablero:
             alineaciones = self.handler.requestMatches()
             self.setMatches(True)
         if(len(alineaciones) != 0):
-            for hor in alineaciones[0]:
-                pass
-            # TODO: ALINEADAS
+            for row in range(len(celdas)):
+                for col in range(len(celdas[row])):
+                    coord = (row, col)
+                    # Marcar alineaciones horziontales
+                    for alineacion in alineaciones[0]:
+                        if(coord in alineacion):
+                            celdas[row][col].setFichaAlineada(True)
+                    # Marcar alineaciones verticales
+                    for alineacion in alineaciones[1]:
+                        if(coord in alineacion):
+                            celdas[row][col].setFichaAlineada(True)

@@ -20,20 +20,6 @@ class Celda(object):
 # Metodos sobre las fichas
 # //
 
-    def setFicha(self, valor):
-        '''DEPRECATED.'''
-        self.__ficha = valor
-        if(self.__ficha == 1):
-            self.__fichaColor = (255, 100, 50)
-        elif(self.__ficha == 2):
-            self.__fichaColor = (120, 255, 50)
-        elif(self.__ficha == 3):
-            self.__fichaColor = (120, 100, 255)
-        elif(self.__ficha == 4):
-            self.__fichaColor = (255, 255, 50)
-        else:
-            self.__fichaColor = (255, 255, 255)
-
     def setFicha2(self, idTipo=0, ficha=None):
         '''Instancia y/o asigna una ficha a la celda.\n
         "tipo" es el id entero del Tipo.\n
@@ -45,34 +31,20 @@ class Celda(object):
         else:
             self.__ficha2 = ficha
 
-    def seleccionarFicha(self):
-        '''DEPRECATED'''
-        self.__seleccionada = True
-
     def seleccionarFicha2(self):
         '''Marca la ficha correspondiente a\n
         esta celda como "seleccionada"'''
         self.__ficha2.setSeleccionada(True)
-
-    def deseleccionarFicha(self):
-        '''DepRECATED'''
-        self.__seleccionada = False
 
     def deseleccionarFicha2(self):
         '''Pone en False la bandera\n
         "seleccionada" de la ficha'''
         self.__ficha2.setSeleccionada(False)
 
-    def getColorFicha(self):
-        '''En el momento de devolver el color de la ficha,
-        retorna el color original si No está seleccionada,
-        retorna el color oscuro si está seleccionada'''
-        if(self.__seleccionada):
-            return self.__fichaColorSeleccionada
-        elif(self.__alineada):
-            return self.__fichaColorAlineada
-        else:
-            return self.__fichaColor
+    def setFichaAlineada(self, valor):
+        '''Marca la ficha de esta celda como\n
+        alineada (True) o no alineada (False)'''
+        self.__ficha2.setAlineada(valor)
 
     def getColorFicha2(self):
         '''Devuelve el color de la ficha'''
@@ -81,8 +53,6 @@ class Celda(object):
     def getFicha2(self):
         return self.__ficha2
         
-    def getFicha(self):
-        return self.__ficha
 # //
 # Métodos sobre la celda
 # //
