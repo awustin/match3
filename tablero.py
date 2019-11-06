@@ -100,14 +100,14 @@ class Tablero:
                     celda = Celda(x_celda, x_celda, col*(x_celda+x_espaciado) +
                                   X_OFF, row*(x_celda+x_espaciado) + Y_OFF,
                                   color)
-                    celda.setFicha2(ficha=fichas[row][col])
+                    celda.setFicha(ficha=fichas[row][col])
                     celda.setColorCelda(color)
                     centro = celda.getPosicionCentro()
                     rect = celda.getRect()
                     draw.rect(ventana, color, rect)
                     colorFicha = fichas[row][col].getColor()
                     gfxdraw.aacircle(ventana, *centro, 15, colorFicha)
-                    gfxdraw.filled_circle(ventana, *centro, 10, colorFicha)
+                    gfxdraw.filled_circle(ventana, *centro, 15, colorFicha)
                     self.__celdas[row].append(celda)
                     if(row == len(fichas)-1 and col == len(fichas[row])-1):
                         self.setCompleto(True)
@@ -116,13 +116,13 @@ class Tablero:
             for row in range(len(celdas)):
                 for col in range(len(celdas[row])):
                     celda = celdas[row][col]
-                    if(not celda.getFicha2().equals(fichas[row][col])):
-                        celda.setFicha2(fichas[row][col].getTipoInt())
+                    if(not celda.getFicha().equals(fichas[row][col])):
+                        celda.setFicha(fichas[row][col].getTipoInt())
                     centro = celda.getPosicionCentro()
-                    colorFicha = celda.getColorFicha2()
+                    colorFicha = celda.getColorFicha()
                     draw.rect(ventana, celda.getColorCelda(), celda.getRect())
                     gfxdraw.aacircle(ventana, *centro, 15, colorFicha)
-                    gfxdraw.filled_circle(ventana, *centro, 10, colorFicha)
+                    gfxdraw.filled_circle(ventana, *centro, 15, colorFicha)
         self.verificarMatches(ventana)
 
     def actualizarTableroConEstado(self, ventana):
@@ -139,7 +139,7 @@ class Tablero:
         for row in range(len(self.__celdas)):
             for col in range(len(self.__celdas[row])):
                 celda = self.__celdas[row][col]
-                celda.deseleccionarFicha2()
+                celda.deseleccionarFicha()
 
     def limpiarSeleccionCeldas(self):
         '''Vacia la lista de seleccionadas en el calculador \n
@@ -165,9 +165,9 @@ class Tablero:
                     print(f'Se clickeó la celda {(row, col)}')
                     estadoFicha = self.handler.seleccionFichasYEstado(row, col)
                     if(estadoFicha['seleccionada']):
-                        celda.seleccionarFicha2()
+                        celda.seleccionarFicha()
                     else:
-                        celda.deseleccionarFicha2()
+                        celda.deseleccionarFicha()
                     if(estadoFicha['swap']):
                         limpiar = True
                         break

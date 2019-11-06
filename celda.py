@@ -7,51 +7,44 @@ class Celda(object):
 
     def __init__(self, x, y, posx=0, posy=0, color=(10, 10, 10)):
         self.__rect = Rect(posx, posy, x, y)
-        self.__seleccionada = False
-        self.__alineada = False
         self.__color = color
-        self.__colorSeleccionada = color
-        self.__ficha2 = None
-        self.__ficha = 0
-        self.__fichaColor = color
-        self.__fichaColorSeleccionada = (10, 10, 10)
-        self.__fichaColorAlineada = (200, 200, 50)
+        self.__ficha = None
 # //
 # Metodos sobre las fichas
 # //
 
-    def setFicha2(self, idTipo=0, ficha=None):
+    def setFicha(self, idTipo=0, ficha=None):
         '''Instancia y/o asigna una ficha a la celda.\n
         "tipo" es el id entero del Tipo.\n
         Si no se pasa un tipo, se asigna\n
         NO_ESPECIFICADO'''
         if(ficha is None):
             ficha = Ficha(idTipo)
-            self.__ficha2 = ficha
+            self.__ficha = ficha
         else:
-            self.__ficha2 = ficha
+            self.__ficha = ficha
 
-    def seleccionarFicha2(self):
+    def seleccionarFicha(self):
         '''Marca la ficha correspondiente a\n
         esta celda como "seleccionada"'''
-        self.__ficha2.setSeleccionada(True)
+        self.__ficha.setSeleccionada(True)
 
-    def deseleccionarFicha2(self):
+    def deseleccionarFicha(self):
         '''Pone en False la bandera\n
         "seleccionada" de la ficha'''
-        self.__ficha2.setSeleccionada(False)
+        self.__ficha.setSeleccionada(False)
 
     def setFichaAlineada(self, valor):
         '''Marca la ficha de esta celda como\n
         alineada (True) o no alineada (False)'''
-        self.__ficha2.setAlineada(valor)
+        self.__ficha.setAlineada(valor)
 
-    def getColorFicha2(self):
+    def getColorFicha(self):
         '''Devuelve el color de la ficha'''
-        return self.__ficha2.getColor()
+        return self.__ficha.getColor()
 
-    def getFicha2(self):
-        return self.__ficha2
+    def getFicha(self):
+        return self.__ficha
         
 # //
 # Métodos sobre la celda
