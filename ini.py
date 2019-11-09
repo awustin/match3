@@ -59,6 +59,7 @@ class App:
                     quit()
                 if(evento.type == pygame.KEYDOWN):
                     if(evento.key == pygame.K_a):
+                        self.tablero.reiniciaFichasCeldasTablero()
                         return
                     if(evento.key == pygame.K_r):
                         self.tablero.reiniciaFichasCeldasTablero()

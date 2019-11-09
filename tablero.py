@@ -1,7 +1,9 @@
 # Tablero
 # Celdas de 50x50 (8x8 celdas)
+import pygame
 from pygame import draw
 from pygame import gfxdraw
+from pygame import time
 from handler import Handler
 from celda import Celda
 from random import random
@@ -78,8 +80,46 @@ class Tablero:
         b = color[2] + difb
         return (r, g, b)
 
-    def actualizarTablero(self, ventana, x_celda, x_espaciado, color_base,
-                          fichas):
+    def generarTableroFilaPorFila(self, ventana, x_celda, x_espaciado,
+                                  color_base, fichas):
+        ''' Cuando las celdas no estén completas, se deberá
+        generarlas.\n
+        Luego, se pide la matriz de fichas random\n
+        Luego, se completa fila a fila, empezando por la ultima.\n
+        ventana es una Surface\n
+        n es el numero de filas (igual al de columnas)\n
+        x_celda es el tamaño de la celda\n
+        x_espaciado es el ancho del espaciado entre celdas\n
+        color_base es el color base de la celda'''
+        color = color_base
+        for row in range(len(fichas)):
+            self.__celdas.append([])
+            for col in range(len(fichas[row])):
+                color = self.gradiente(color)
+                celda = Celda(x_celda, x_celda, col*(x_celda+x_espaciado) +
+                              X_OFF, row*(x_celda+x_espaciado) + Y_OFF,
+                              color)
+                celda.setColorCelda(color)
+                rect = celda.getRect()
+                draw.rect(ventana, color, rect)
+                self.__celdas[row].append(celda)
+        pygame.display.update()
+        time.wait(100)
+        for row in reversed(range(len(fichas))):
+            for col in range(len(fichas)):
+                celda = self.__celdas[row][col]
+                centro = celda.getPosicionCentro()
+                celda.setFicha(ficha=fichas[row][col])
+                colorFicha = celda.getColorFicha()
+                gfxdraw.aacircle(ventana, *centro, 15, colorFicha)
+                gfxdraw.filled_circle(ventana, *centro, 15, colorFicha)
+                time.wait(10)
+                pygame.display.update()
+                if(row == len(self.__celdas)-1
+                   and col == len(self.__celdas[row])-1):
+                    self.setCompleto(True)
+
+    def actualizarTablero(self, ventana, x_celda, x_espaciado, fichas):
         '''Actualiza el tablero.
         Si no está completo (no se dibujaron todas las celdas),
         se crean instancias de Celda.
@@ -91,47 +131,30 @@ class Tablero:
         x_espaciado es el espaciado entre las celdas.
         color_base es el color de la celda
         fichas es la matriz (objetos) de fichas'''
-        color = color_base
-        if(not self.__celdasEstanCompletas):
-            for row in range(len(fichas)):
-                self.__celdas.append([])
-                for col in range(len(fichas[row])):
-                    color = self.gradiente(color)
-                    celda = Celda(x_celda, x_celda, col*(x_celda+x_espaciado) +
-                                  X_OFF, row*(x_celda+x_espaciado) + Y_OFF,
-                                  color)
-                    celda.setFicha(ficha=fichas[row][col])
-                    celda.setColorCelda(color)
-                    centro = celda.getPosicionCentro()
-                    rect = celda.getRect()
-                    draw.rect(ventana, color, rect)
-                    colorFicha = fichas[row][col].getColor()
-                    gfxdraw.aacircle(ventana, *centro, 15, colorFicha)
-                    gfxdraw.filled_circle(ventana, *centro, 15, colorFicha)
-                    self.__celdas[row].append(celda)
-                    if(row == len(fichas)-1 and col == len(fichas[row])-1):
-                        self.setCompleto(True)
-        else:
-            celdas = self.__celdas
-            for row in range(len(celdas)):
-                for col in range(len(celdas[row])):
-                    celda = celdas[row][col]
-                    if(not celda.getFicha().equals(fichas[row][col])):
-                        celda.setFicha(fichas[row][col].getTipoInt())
-                    centro = celda.getPosicionCentro()
-                    colorFicha = celda.getColorFicha()
-                    draw.rect(ventana, celda.getColorCelda(), celda.getRect())
-                    gfxdraw.aacircle(ventana, *centro, 15, colorFicha)
-                    gfxdraw.filled_circle(ventana, *centro, 15, colorFicha)
+        celdas = self.__celdas
+        for row in range(len(celdas)):
+            for col in range(len(celdas[row])):
+                celda = celdas[row][col]
+                if(not celda.getFicha().equals(fichas[row][col])):
+                    celda.setFicha(fichas[row][col].getTipoInt())
+                centro = celda.getPosicionCentro()
+                colorFicha = celda.getColorFicha()
+                draw.rect(ventana, celda.getColorCelda(), celda.getRect())
+                gfxdraw.aacircle(ventana, *centro, 15, colorFicha)
+                gfxdraw.filled_circle(ventana, *centro, 15, colorFicha)
         self.verificarMatches(ventana)
 
     def actualizarTableroConEstado(self, ventana):
         ''' Actualiza el tablero, segun el estado de las fichas
         y las alineaciones.
-        El programa principal debe llamar a esta función en cada iteración'''
-        fichas = self.handler.requestFichas(N_CELDAS)
+        El programa principal debe llamar a esta función en cada iteración'''        
         color_base = self.__color_base
-        self.actualizarTablero(ventana, X_CELDA, 5, color_base, fichas)
+        fichas = self.handler.requestFichas(N_CELDAS)
+        if(not self.__celdasEstanCompletas):
+            self.generarTableroFilaPorFila(ventana, X_CELDA, 5, color_base,
+                                           fichas)
+        else:
+            self.actualizarTablero(ventana, X_CELDA, 5, fichas)
 
     def deseleccionarTodasCeldas(self):
         '''Recorre la matriz de celdas y deselecciona

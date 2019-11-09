@@ -9,39 +9,45 @@ class Calculador(object):
         self.__fichasSeleccionadas = ([])
         # fichasSeleccionadas: maximo dos simultaneamente
 
+    def generarFichaRan(self):
+        '''Genera un entero entre 1 y 4'''
+        ran = random()
+        if(ran > 0 and ran <= 0.25):
+            return 1
+        elif(ran > 0.25 and ran <= 0.5):
+            return 2
+        elif(ran > 0.5 and ran <= 0.75):
+            return 3
+        else:
+            return 4
+
     def setFichasVacias(self, n):
+        '''Arma una matriz nxn de 0'''
         for row in range(n):
             self.__fichas.append([])
             for col in range(n):
                 self.__fichas[row].append(0)
 
     def setFichasRan(self, n):
+        '''Arma una matriz nxn de numeros aleatorios entre 1 y 4'''
         for row in range(n):
             self.__fichas.append([])
             for col in range(n):
-                ran = random()
-                if(ran > 0 and ran <= 0.25):
-                    ficha = 1
-                elif(ran > 0.25 and ran <= 0.5):
-                    ficha = 2
-                elif(ran > 0.5 and ran <= 0.75):
-                    ficha = 3
-                else:
-                    ficha = 4
+                ficha = self.generarFichaRan()
                 self.__fichas[row].append(ficha)
 
-    def getFichaXY(self, x, y):
-        ran = random()
-        if(ran > 0 and ran <= 0.25):
-            ficha = 1
-        elif(ran > 0.25 and ran <= 0.5):
-            ficha = 2
-        elif(ran > 0.5 and ran <= 0.75):
-            ficha = 3
+    def agregarFilaFichasRan(self, n):
+        '''A la matriz que ya existe, le agrega una fila de numeros
+        aleatorios entre 1 y 4'''
+        if(len(self.__fichas) >= 8):
+            print("Ya hay 8 filas en la matriz de fichas")
         else:
-            ficha = 4
-        self.__fichas[x][y] = ficha
-        return ficha
+            fila = []
+            for col in range(n):
+                ficha = self.generarFichaRan()
+                fila.append(ficha)
+            self.__fichas.append(fila)
+        return fila
 
     def getFichas(self):
         return self.__fichas
