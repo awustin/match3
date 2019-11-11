@@ -9,6 +9,9 @@ class Calculador(object):
         self.__fichasSeleccionadas = ([])
         # fichasSeleccionadas: maximo dos simultaneamente
 
+    def getFichas(self):
+        return self.__fichas
+
     def generarFichaRan(self):
         '''Genera un entero entre 1 y 4'''
         ran = random()
@@ -28,12 +31,42 @@ class Calculador(object):
             for col in range(n):
                 self.__fichas[row].append(0)
 
+    def checkeoDeIguales(self, ficha, row, col):
+        '''Chequea que no halla alineaciones de 3 y
+        cambia si lo hay. Argumentos:\n
+        ficha: entero\n
+        row: fila\n
+        col: columna\n'''
+        if(row <= 1 and col <= 1):
+            '''No se hace ningun chequeo en 0,0 0,1 1,0 y 1,1'''
+            return ficha
+        if(row <= 1 and col > 1):
+            '''Chequea que no haya alineaciones horizontales'''
+            while(self.__fichas[row][col - 1] == ficha and
+                  self.__fichas[row][col - 2] == ficha):
+                ficha = self.generarFichaRan()
+        elif(row > 1 and col <= 1):
+            '''Chequea que no haya alineaciones verticales'''
+            while(self.__fichas[row - 1][col] == ficha and
+                  self.__fichas[row - 2][col] == ficha):
+                ficha = self.generarFichaRan()
+        elif(row > 1 and col > 1):
+            '''Chequea que no haya alineaciones ni verticales
+            ni horizontales'''
+            while((self.__fichas[row - 1][col] == ficha and
+                  self.__fichas[row - 2][col] == ficha) or
+                  (self.__fichas[row][col - 1] == ficha and
+                  self.__fichas[row][col - 2] == ficha)):
+                ficha = self.generarFichaRan()
+        return ficha
+
     def setFichasRan(self, n):
         '''Arma una matriz nxn de numeros aleatorios entre 1 y 4'''
         for row in range(n):
             self.__fichas.append([])
             for col in range(n):
                 ficha = self.generarFichaRan()
+                ficha = self.checkeoDeIguales(ficha, row, col)
                 self.__fichas[row].append(ficha)
 
     def agregarFilaFichasRan(self, n):
@@ -48,9 +81,6 @@ class Calculador(object):
                 fila.append(ficha)
             self.__fichas.append(fila)
         return fila
-
-    def getFichas(self):
-        return self.__fichas
 
     def logicaSeleccionFichas(self, x, y, estado):
         fichasSeleccionadas = self.__fichasSeleccionadas

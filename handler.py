@@ -10,20 +10,20 @@ class Handler(object):
         self.__fichas = []
         self.__calculador = Calculador(tamanio)
 
-    def armarFilaDeFichasRan(self, n=0):
-        '''Pide al calculador que arme una fila de enteros aleatorias.\n
-        Dicha fila se guarda en el calculador como una
-        nueva fila. Asi se van generando nuevas filas cada
-        vez que se llama a este método.\n
-        Devuelve una fila de instancias de Ficha'''
-        fila = self.__calculador.agregarFilaFichasRan(n)
-        filaFichas = []
-        for item in fila:
-            idTipoFicha = item
-            ficha = Ficha(idTipoFicha)
-            filaFichas.append(ficha)
-        self.__fichas.append(filaFichas)
-        return filaFichas
+    #def armarFilaDeFichasRan(self, n=0):
+    #    '''Pide al calculador que arme una fila de enteros aleatorias.\n
+    #    Dicha fila se guarda en el calculador como una
+    #    nueva fila. Asi se van generando nuevas filas cada
+    #    vez que se llama a este método.\n
+    #    Devuelve una fila de instancias de Ficha'''
+    #    fila = self.__calculador.agregarFilaFichasRan(n)
+    #    filaFichas = []
+    #    for item in fila:
+    #        idTipoFicha = item
+    #        ficha = Ficha(idTipoFicha)
+    #        filaFichas.append(ficha)
+    #    self.__fichas.append(filaFichas)
+    #    return filaFichas
 
     def requestFichasRan(self, n):
         ''' Arma matriz de fichas aleatorias y devuelve dicha matriz.
