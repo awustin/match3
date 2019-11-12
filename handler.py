@@ -9,22 +9,7 @@ class Handler(object):
         print("Handler")
         self.__fichas = []
         self.__calculador = Calculador(tamanio)
-
-    #def armarFilaDeFichasRan(self, n=0):
-    #    '''Pide al calculador que arme una fila de enteros aleatorias.\n
-    #    Dicha fila se guarda en el calculador como una
-    #    nueva fila. Asi se van generando nuevas filas cada
-    #    vez que se llama a este método.\n
-    #    Devuelve una fila de instancias de Ficha'''
-    #    fila = self.__calculador.agregarFilaFichasRan(n)
-    #    filaFichas = []
-    #    for item in fila:
-    #        idTipoFicha = item
-    #        ficha = Ficha(idTipoFicha)
-    #        filaFichas.append(ficha)
-    #    self.__fichas.append(filaFichas)
-    #    return filaFichas
-
+        
     def requestFichasRan(self, n):
         ''' Arma matriz de fichas aleatorias y devuelve dicha matriz.
         n es la dimension de la matriz cuadrada'''
@@ -81,9 +66,11 @@ class Handler(object):
         '''Devuelve un diccionario 'estadoFicha' que posee: \n
         'seleccionada': Si la ficha (x, y) quedó en la lista de seleccion \n
         'swap': Si la ficha se intercambia con otra \n
+        'anterior': Si hay q deseleccionar la primera ficha \n
+        que se seleccionó, se pasa por esta clave
         Este método dispara la lógica de selección de fichas en el \n
         calculador'''
-        estadoFicha = {'seleccionada': False, 'swap': False}
+        estadoFicha = {'seleccionada': False, 'swap': False, 'anterior': None}
         self.__calculador.logicaSeleccionFichas(x, y, estadoFicha)
         return estadoFicha
 

@@ -104,7 +104,6 @@ class Tablero:
                 draw.rect(ventana, color, rect)
                 self.__celdas[row].append(celda)
         pygame.display.update()
-        time.wait(100)
         for row in reversed(range(len(fichas))):
             for col in range(len(fichas)):
                 celda = self.__celdas[row][col]
@@ -113,7 +112,7 @@ class Tablero:
                 colorFicha = celda.getColorFicha()
                 gfxdraw.aacircle(ventana, *centro, 15, colorFicha)
                 gfxdraw.filled_circle(ventana, *centro, 15, colorFicha)
-                time.wait(10)
+                time.wait(7)
                 pygame.display.update()
                 if(row == len(self.__celdas)-1
                    and col == len(self.__celdas[row])-1):
@@ -187,9 +186,13 @@ class Tablero:
                     dentroCuadricula = True
                     print(f'Se clickeó la celda {(row, col)}')
                     estadoFicha = self.handler.seleccionFichasYEstado(row, col)
+                    print(estadoFicha)
                     if(estadoFicha['seleccionada']):
                         celda.seleccionarFicha()
                     else:
+                        p0 = estadoFicha['anterior']
+                        if(p0 is not None):
+                            self.__celdas[p0[0]][p0[1]].deseleccionarFicha()
                         celda.deseleccionarFicha()
                     if(estadoFicha['swap']):
                         limpiar = True

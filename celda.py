@@ -45,7 +45,7 @@ class Celda(object):
 
     def getFicha(self):
         return self.__ficha
-        
+
 # //
 # Métodos sobre la celda
 # //

@@ -24,9 +24,8 @@ class Ficha(object):
     def setSeleccionada(self, valor):
         '''Asigna valor booleano\n
         y setea el color correspondiente'''
-        if(valor):
-            self.setColor()
         self.__seleccionada = valor
+        self.setColor()
 
     def getTipo(self):
         return self.__tipo
@@ -39,8 +38,8 @@ class Ficha(object):
     def setTipo(self, tipo):
         '''Asigna el tipo\n
         y setea el color correspondiente'''
-        self.setColor()
         self.__tipo = tipo
+        self.setColor()
 
     def getAlineada(self):
         return self.__alineada

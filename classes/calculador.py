@@ -83,20 +83,36 @@ class Calculador(object):
         return fila
 
     def logicaSeleccionFichas(self, x, y, estado):
+        '''Se fija en la lista de fichas seleccionadas y setea
+        el valor de la ficha actual. Argumentos:\n
+        x: es la fila actual\n
+        y: es la columna actual\n
+        estado: es un diccionario {seleccionada: False, swap: False}\n'''
         fichasSeleccionadas = self.__fichasSeleccionadas
         if(len(fichasSeleccionadas) == 0):
+            '''Es la primera seleccion'''
             self.agregarFichaSeleccionada(x, y)
             estado['seleccionada'] = True
         elif(len(fichasSeleccionadas) == 1):
+            '''Es la segunda selección'''
             primerItem = fichasSeleccionadas[0]
-            if(primerItem != (x, y)):
-                print("Swapping: [%d, %d] con [%d, %d]" % (x, y, *primerItem))
-                self.swapFichas(*primerItem, *(x, y))
-                estado['swap'] = True
-            else:
+            x0 = fichasSeleccionadas[0][0]
+            y0 = fichasSeleccionadas[0][1]
+            if(primerItem == (x, y)):
+                '''Se elije la misma ficha'''
                 print("Se selecciono la misma")
                 self.limpiarFichasSeleccionadas()
                 estado['seleccionada'] = False
+            elif(self.__fichas[x0][y0] == self.__fichas[x][y]):
+                '''Se elije la misma ficha'''
+                print("Se selecciono la misma")
+                self.limpiarFichasSeleccionadas()
+                estado['seleccionada'] = False
+                estado['anterior'] = (x0, y0)
+            else:
+                print("Swapping: [%d, %d] con [%d, %d]" % (x, y, *primerItem))
+                self.swapFichas(*primerItem, *(x, y))
+                estado['swap'] = True
         else:
             print("Hay mas de 2 fichas seleccionadas")
             estado['seleccionada'] = False
