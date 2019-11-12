@@ -142,14 +142,6 @@ class Calculador(object):
                 seleccionada = True
         return seleccionada
 
-    def buscarMatches(self):
-        '''Devuelve una tupla de dos listas:\n
-            alineaciones horizontales\n
-            alineaciones verticales\n'''
-        alineacionesH = self.__buscarHorizontales()
-        alineacionesV = self.__buscarVerticales()
-        return (alineacionesH, alineacionesV)
-
     def __buscarHorizontales(self):
         fichas = self.__fichas
         alineacionesH = []
@@ -209,3 +201,34 @@ class Calculador(object):
             vertical = []
             alineadas = []
         return alineacionesV
+
+    def logicaEliminacionFichas(self, alineH, alineV):
+        '''Pone en -1 todos los lugares donde
+        se encontraron alineaciones'''
+        if(alineH != []):
+            for alineacion in alineH:
+                for ficha in alineacion:
+                    x = ficha[0]
+                    y = ficha[1]
+                    self.__fichas[x][y] = -1
+        if(alineV != []):
+            for alineacion in alineV:
+                for ficha in alineacion:
+                    x = ficha[0]
+                    y = ficha[1]
+                    self.__fichas[x][y] = -1
+        print(self.__fichas)
+
+    def logicaAlineacionFichas(self):
+        '''Se encarga de:\n
+        Buscar alineaciones horizontales,\n
+        Buscar alineaciones verticales,\n
+        Poner en -1 las fichas alineadas.\n
+        Devuelve False si no hay alineaciones'''
+        hayMatches = False
+        alineacionesH = self.__buscarHorizontales()
+        alineacionesV = self.__buscarVerticales()
+        if(alineacionesH != [] or alineacionesV != []):
+            hayMatches = True
+            self.logicaEliminacionFichas(alineacionesH, alineacionesV)
+        return hayMatches

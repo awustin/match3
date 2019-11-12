@@ -118,6 +118,12 @@ class Tablero:
                    and col == len(self.__celdas[row])-1):
                     self.setCompleto(True)
 
+    def logicaAlineacionFichas(self):
+        '''Pide que se determinen las alineaciones.
+        El calculador revisa su lista de alineaciones,
+        y si encuentra, dispara la logica de eliminación'''
+        return self.handler.logicaAlineacionFichas()
+
     def actualizarTablero(self, ventana, x_celda, x_espaciado, fichas):
         '''Actualiza el tablero.
         Si no está completo (no se dibujaron todas las celdas),
@@ -141,7 +147,7 @@ class Tablero:
                 draw.rect(ventana, celda.getColorCelda(), celda.getRect())
                 gfxdraw.aacircle(ventana, *centro, 15, colorFicha)
                 gfxdraw.filled_circle(ventana, *centro, 15, colorFicha)
-        self.verificarMatches(ventana)
+        self.__matches = self.logicaAlineacionFichas()
 
     def actualizarTableroConEstado(self, ventana):
         ''' Actualiza el tablero, segun el estado de las fichas
@@ -202,24 +208,3 @@ class Tablero:
             print("Fuera del tablero")
         if(limpiar):
             self.limpiarSeleccionCeldas()
-
-    def verificarMatches(self, ventana):
-        '''Verifica la existencia de alineaciones\n
-        a partir de 3 fichas'''
-        celdas = self.__celdas
-        alineaciones = []
-        if(not self.__matches):
-            alineaciones = self.handler.requestMatches()
-            self.setMatches(True)
-        if(len(alineaciones) != 0):
-            for row in range(len(celdas)):
-                for col in range(len(celdas[row])):
-                    coord = (row, col)
-                    # Marcar alineaciones horziontales
-                    for alineacion in alineaciones[0]:
-                        if(coord in alineacion):
-                            celdas[row][col].setFichaAlineada(True)
-                    # Marcar alineaciones verticales
-                    for alineacion in alineaciones[1]:
-                        if(coord in alineacion):
-                            celdas[row][col].setFichaAlineada(True)

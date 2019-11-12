@@ -74,10 +74,10 @@ class Handler(object):
         self.__calculador.logicaSeleccionFichas(x, y, estadoFicha)
         return estadoFicha
 
-    def requestMatches(self):
-        '''Pide al calculador que verifique si hay
-        alineaciones'''
-        return self.__calculador.buscarMatches()
+    def logicaAlineacionFichas(self):
+        '''Pide al calculador que busque alineaciones.
+        Retorna False si no encuentra.'''
+        return self.__calculador.logicaAlineacionFichas()
 
     def reiniciarCalculador(self):
         self.__calculador.limpiarFichasSeleccionadas()
