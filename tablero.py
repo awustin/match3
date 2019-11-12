@@ -140,13 +140,21 @@ class Tablero:
         for row in range(len(celdas)):
             for col in range(len(celdas[row])):
                 celda = celdas[row][col]
-                if(not celda.getFicha().equals(fichas[row][col])):
-                    celda.setFicha(fichas[row][col].getTipoInt())
-                centro = celda.getPosicionCentro()
-                colorFicha = celda.getColorFicha()
-                draw.rect(ventana, celda.getColorCelda(), celda.getRect())
-                gfxdraw.aacircle(ventana, *centro, 15, colorFicha)
-                gfxdraw.filled_circle(ventana, *centro, 15, colorFicha)
+                if(fichas[row][col] is not None):
+                    '''La ficha existe'''
+                    if(not celda.getFicha().equals(fichas[row][col])):
+                        '''La ficha se intercambió'''
+                        celda.setFicha(fichas[row][col].getTipoInt())
+                    centro = celda.getPosicionCentro()
+                    colorFicha = celda.getColorFicha()
+                    draw.rect(ventana, celda.getColorCelda(), celda.getRect())
+                    gfxdraw.aacircle(ventana, *centro, 15, colorFicha)
+                    gfxdraw.filled_circle(ventana, *centro, 15, colorFicha)
+                else:
+                    '''La ficha se eliminó'''
+                    centro = celda.getPosicionCentro()
+                    colorFicha = celda.getColorFicha()
+                    draw.rect(ventana, celda.getColorCelda(), celda.getRect())
         self.__matches = self.logicaAlineacionFichas()
 
     def actualizarTableroConEstado(self, ventana):

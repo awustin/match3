@@ -32,8 +32,11 @@ class Handler(object):
             for row in range(len(enteros)):
                 fichas.append([])
                 for col in range(len(enteros[row])):
-                    idTipo = enteros[row][col]
-                    ficha = Ficha(idTipo)
+                    if(enteros[row][col] != -1):
+                        idTipo = enteros[row][col]
+                        ficha = Ficha(idTipo)
+                    else:
+                        ficha = None
                     fichas[row].append(ficha)
             self.__fichas = fichas
             return self.__fichas
@@ -48,12 +51,30 @@ class Handler(object):
             for row in range(len(enteros)):
                 fichasNuevas.append([])
                 for col in range(len(enteros[row])):
-                    tipoAnterior = fichasAnterior[row][col].getTipoInt()
-                    if(tipoAnterior == enteros[row][col]):
-                        ficha = fichasAnterior[row][col]
+                    if(fichasAnterior[row][col] is None):
+                        '''Habia una ficha eliminada (nula)'''
+                        if(enteros[row][col] == -1):
+                            '''La ficha ya está eliminada'''
+                            ficha = fichasAnterior[row][col]
+                        else:
+                            '''La ficha se crea en el lugar de una eliminada'''
+                            # TODO
+                            Exception(NotImplementedError)
                     else:
-                        tipoNuevo = enteros[row][col]
-                        ficha = Ficha(tipoNuevo)
+                        '''Había una ficha no nula'''
+                        if(enteros[row][col] == -1):
+                            '''La ficha existente se va a eliminar (-1)'''
+                            ficha = None
+                        else:
+                            '''La ficha no se elimina'''
+                            tipoAnterior = fichasAnterior[row][col].getTipoInt()
+                            if(tipoAnterior == enteros[row][col]):
+                                '''La ficha coincide con el entero que trae'''
+                                ficha = fichasAnterior[row][col]
+                            else:
+                                '''La ficha no coincide con el entero que trae'''
+                                tipoNuevo = enteros[row][col]
+                                ficha = Ficha(tipoNuevo)
                     fichasNuevas[row].append(ficha)
             self.__fichas = fichasNuevas
             return self.__fichas
