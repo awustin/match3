@@ -217,7 +217,6 @@ class Calculador(object):
                     x = ficha[0]
                     y = ficha[1]
                     self.__fichas[x][y] = -1
-        print(self.__fichas)
 
     def logicaAlineacionFichas(self):
         '''Se encarga de:\n
@@ -232,3 +231,11 @@ class Calculador(object):
             hayMatches = True
             self.logicaEliminacionFichas(alineacionesH, alineacionesV)
         return hayMatches
+
+    def logicaReemplazoFichas(self):
+        '''Se encarga de colocar nuevos números en
+        donde hay -1'''
+        for row in range(len(self.__fichas)):
+            for col in range(len(self.__fichas[row])):
+                if(self.__fichas[row][col] == -1):
+                    self.__fichas[row][col] = self.generarFichaRan()

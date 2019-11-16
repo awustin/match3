@@ -124,6 +124,13 @@ class Tablero:
         y si encuentra, dispara la logica de eliminación'''
         return self.handler.logicaAlineacionFichas()
 
+    def reemplazarFichasAlineadas(self):
+        '''Reemplaza las fichas alineadas.
+        Solo activa el reemplazo.
+        El metodo actualizarTablero muestra cambios'''
+        print("Reemplazando fichas...")
+        self.handler.logicaReemplazoFichas()
+
     def actualizarTablero(self, ventana, x_celda, x_espaciado, fichas):
         '''Actualiza el tablero.
         Si no está completo (no se dibujaron todas las celdas),
@@ -167,6 +174,8 @@ class Tablero:
             self.generarTableroFilaPorFila(ventana, X_CELDA, 5, color_base,
                                            fichas)
         else:
+            if(self.__matches):
+                self.reemplazarFichasAlineadas()
             self.actualizarTablero(ventana, X_CELDA, 5, fichas)
 
     def deseleccionarTodasCeldas(self):

@@ -58,8 +58,8 @@ class Handler(object):
                             ficha = fichasAnterior[row][col]
                         else:
                             '''La ficha se crea en el lugar de una eliminada'''
-                            # TODO
-                            Exception(NotImplementedError)
+                            tipoNuevo = enteros[row][col]
+                            ficha = Ficha(tipoNuevo)
                     else:
                         '''Había una ficha no nula'''
                         if(enteros[row][col] == -1):
@@ -99,6 +99,11 @@ class Handler(object):
         '''Pide al calculador que busque alineaciones.
         Retorna False si no encuentra.'''
         return self.__calculador.logicaAlineacionFichas()
+
+    def logicaReemplazoFichas(self):
+        '''Pide al calculador que reemplace las fichas que
+        están en -1'''
+        self.__calculador.logicaReemplazoFichas()
 
     def reiniciarCalculador(self):
         self.__calculador.limpiarFichasSeleccionadas()
