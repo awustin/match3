@@ -1,12 +1,13 @@
 # Calculador
 from random import random
+from classes.alineacion import Alineacion
 
 
 class Calculador(object):
     def __init__(self, tamanio):
         self.__init = True
         self.__fichas = []
-        self.__fichasSeleccionadas = ([])
+        self.__alineaciones = Alineacion()
         # fichasSeleccionadas: maximo dos simultaneamente
 
     def getFichas(self):
@@ -88,27 +89,23 @@ class Calculador(object):
         x: es la fila actual\n
         y: es la columna actual\n
         estado: es un diccionario {seleccionada: False, swap: False}\n'''
-        fichasSeleccionadas = self.__fichasSeleccionadas
-        if(len(fichasSeleccionadas) == 0):
+        alineacion = self.__alineaciones
+        if(not alineacion.haySeleccionadas()):
             '''Es la primera seleccion'''
-            self.agregarFichaSeleccionada(x, y)
+            alineacion.agregarASeleccion((x, y))
             estado['seleccionada'] = True
-        elif(len(fichasSeleccionadas) == 1):
+        elif(alineacion.hayUnaSeleccionada()):
             '''Es la segunda selección'''
-            primerItem = fichasSeleccionadas[0]
-            x0 = fichasSeleccionadas[0][0]
-            y0 = fichasSeleccionadas[0][1]
-            if(primerItem == (x, y)):
+            primerItem = alineacion.getSeleccionadas()[0]
+            x0 = primerItem[0]
+            y0 = primerItem[1]
+            if(primerItem == (x, y) or
+               self.__fichas[x0][y0] == self.__fichas[x][y]):
                 '''Se elije la misma ficha'''
                 print("Se selecciono la misma")
-                self.limpiarFichasSeleccionadas()
                 estado['seleccionada'] = False
-            elif(self.__fichas[x0][y0] == self.__fichas[x][y]):
-                '''Se elije la misma ficha'''
-                print("Se selecciono la misma")
-                self.limpiarFichasSeleccionadas()
-                estado['seleccionada'] = False
-                estado['anterior'] = (x0, y0)
+                estado['anterior'] = primerItem
+                alineacion.limpiarSeleccion()
             else:
                 print("Swapping: [%d, %d] con [%d, %d]" % (x, y, *primerItem))
                 self.swapFichas(*primerItem, *(x, y))
@@ -116,13 +113,11 @@ class Calculador(object):
         else:
             print("Hay mas de 2 fichas seleccionadas")
             estado['seleccionada'] = False
-            self.limpiarFichasSeleccionadas()
-
-    def agregarFichaSeleccionada(self, x, y):
-        self.__fichasSeleccionadas.append((x, y))
+            alineacion.limpiarSeleccion()
 
     def limpiarFichasSeleccionadas(self):
-        self.__fichasSeleccionadas = ([])
+        alineacion = self.__alineaciones
+        alineacion.limpiarSeleccion()
 
     def vaciarMatrizFichasEnteros(self):
         self.__fichas.clear()
@@ -133,74 +128,6 @@ class Calculador(object):
         aux = fichas[x1][y1]
         fichas[x1][y1] = fichas[x2][y2]
         fichas[x2][y2] = aux
-
-    def estaEnLaSeleccion(self, x, y):
-        fichasSeleccionadas = self.__fichasSeleccionadas
-        seleccionada = False
-        for ficha in range(len(fichasSeleccionadas)):
-            if((x, y) == ficha):
-                seleccionada = True
-        return seleccionada
-
-    def __buscarHorizontales(self):
-        fichas = self.__fichas
-        alineacionesH = []
-        alineadas = []
-        horizontal = []
-        cont = 0
-        for row in range(len(fichas)):
-            for col in range(len(fichas[row])):
-                candidato = fichas[row][col]
-                if(col == 0):
-                    horizontal.append(candidato)
-                    alineadas.append((row, col))
-                    continue
-                if((horizontal[0] - candidato) != 0):
-                    if(len(horizontal) > 2):
-                        print(f'FILA {row}: {alineadas}')
-                        alineacionesH.append(alineadas)
-                        cont = cont + 1
-                    horizontal = []
-                    alineadas = []
-                horizontal.append(candidato)
-                alineadas.append((row, col))
-            if(len(horizontal) > 2):
-                print(f'FILA {row}: {alineadas}')
-                alineacionesH.append(alineadas)
-                cont = cont + 1
-            horizontal = []
-            alineadas = []
-        return alineacionesH
-
-    def __buscarVerticales(self):
-        fichas = self.__fichas
-        cont = 0
-        alineacionesV = []
-        alineadas = []
-        vertical = []
-        for col in range(len(fichas)):
-            for row in range(len(fichas[col])):
-                candidato = fichas[row][col]
-                if(row == 0):
-                    vertical.append(candidato)
-                    alineadas.append((row, col))
-                    continue
-                if((vertical[0] - candidato) != 0):
-                    if(len(vertical) > 2):
-                        print(f'COL {col}: {alineadas}')
-                        alineacionesV.append(alineadas)
-                        cont = cont + 1
-                    vertical = []
-                    alineadas = []
-                vertical.append(candidato)
-                alineadas.append((row, col))
-            if(len(vertical) > 2):
-                print(f'COL {col}: {alineadas}')
-                alineacionesV.append(alineadas)
-                cont = cont + 1
-            vertical = []
-            alineadas = []
-        return alineacionesV
 
     def logicaEliminacionFichas(self, alineH, alineV):
         '''Pone en -1 todos los lugares donde
@@ -225,8 +152,8 @@ class Calculador(object):
         Poner en -1 las fichas alineadas.\n
         Devuelve False si no hay alineaciones'''
         hayMatches = False
-        alineacionesH = self.__buscarHorizontales()
-        alineacionesV = self.__buscarVerticales()
+        alineacionesH = self.__alineaciones.buscarHorizontales(self.__fichas, 3)
+        alineacionesV = self.__alineaciones.buscarVerticales(self.__fichas, 3)
         if(alineacionesH != [] or alineacionesV != []):
             hayMatches = True
             self.logicaEliminacionFichas(alineacionesH, alineacionesV)
