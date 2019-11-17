@@ -183,4 +183,3 @@ class Calculador(object):
             else:
                 columna.append(self.__fichas[i][col])
         return columna
-

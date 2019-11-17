@@ -10,6 +10,7 @@ class Celda(object):
         self.__color = color
         self.__coord = ()
         self.__ficha = None
+        self.__sueltaFicha = False
 # //
 # Get - Set
 # //
@@ -24,6 +25,14 @@ class Celda(object):
         '''Devuelve el indice que ocupa la celda
         en el tablero'''
         return self.__coord
+
+    def sueltaFicha(self):
+        '''Devuelve True si esta haciendo un pasaje
+        de fichas'''
+        return self.__sueltaFicha
+    
+    def setSueltaFicha(self, valor):
+        self.__sueltaFicha = valor
 
 # //
 # Metodos sobre las fichas
@@ -102,3 +111,10 @@ class Celda(object):
             ficha = self.getFicha()
             celda.setFicha(ficha=ficha)
             self.__ficha = None
+
+    def distanciaY(self, celda):
+        '''Calcula la distancia vertical (en pixeles)
+        entre los centros de esta celda y la celda que se
+        pasa como argumento'''
+        distancia = self.getPosicionCentro()[0] - celda.getPosicionCentro()[0]
+        return abs(distancia)

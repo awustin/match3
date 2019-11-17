@@ -72,7 +72,11 @@ class App:
                         self.tablero.clickXY(*mouse.get_pos())
                         mostrarInfo = True
             self.pantalla.colorFondo(colorPpal)
-            self.tablero.actualizarTableroConEstado(self.pantalla.getDisplay())
+            fichasCaen = self.tablero.actualizarTableroConEstado(self.pantalla.getDisplay())
+            if(fichasCaen):
+                self.tablero.alineacionEnTablero(self.pantalla.getDisplay())
+                self.tablero.pasarFichasEntreCeldas(self.pantalla.getDisplay(), colorPpal)
+                self.tablero.rellenarCeldasPorColumna(self.pantalla.getDisplay())
             if(mostrarInfo):
                 self.pantalla.dibujar(infoXY.getSurface(), (0, 0))
             pygame.display.update()

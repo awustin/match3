@@ -16,6 +16,8 @@ X_OFF = (globales.DIMENSION[0] - X_CUAD) / 2
 Y_OFF = (globales.DIMENSION[1] - Y_CUAD) / 2
 N_CELDAS = 8
 X_CELDA = X_CUAD/N_CELDAS
+GRAVEDAD = 0.5
+RESOLUCION = 1
 
 
 class Tablero:
@@ -130,6 +132,20 @@ class Tablero:
         Las setea en -1.'''
         self.__seAnularon = self.handler.anularFichasAlineadas()
 
+    def actualizarFilaCaenFichas(self, ventana, celdas):
+        '''Actualiza la fila mientras caen fichas'''
+        rect = []
+        for celda in celdas:
+            rect.append(celda.getRect())
+        pygame.display.update(rect)
+        for celda in celdas:
+            centro = celda.getPosicionCentro()
+            if(celda.hayFicha()):
+                colorFicha = celda.getColorFicha()
+                gfxdraw.aacircle(ventana, *centro, 15, colorFicha)
+                gfxdraw.filled_circle(ventana, *centro, 15, colorFicha)
+            pygame.display.update()
+
     def actualizarTableroCaenFichas(self, ventana):
         '''Actualiza el tablero sin pedir al calculador la
         matriz de fichas. Sirve para estados de transición como
@@ -145,21 +161,36 @@ class Tablero:
                     gfxdraw.aacircle(ventana, *centro, 15, colorFicha)
                     gfxdraw.filled_circle(ventana, *centro, 15, colorFicha)
 
-    def actualizarFilaCaenFichas(self, ventana, celdas):
-        '''Actualiza la fila mientras caen fichas'''
-        rect = []
-        for celda in celdas:
-            rect.append(celda.getRect())
-        pygame.display.update(rect)
-        for celda in celdas:
-            centro = celda.getPosicionCentro()
-            if(celda.hayFicha()):
-                colorFicha = celda.getColorFicha()
-                gfxdraw.aacircle(ventana, *centro, 15, colorFicha)
-                gfxdraw.filled_circle(ventana, *centro, 15, colorFicha)
-            pygame.display.update()
+    def fichasCaen(self, ventana, colorFondo, row, col):
+        celdas = self.__celdas
+        celdaInicio = self.__celdas[row][col]
+        celdaFinal = self.__celdas[row+1][col]
+        pos = celdaInicio.getPosicionCentro()
+        final = celdaFinal.getPosicionCentro()
+        t = 0
+        y = pos[1]
+        while(y <= final[1]):
+            ventana.fill(colorFondo)
+            for row in range(len(celdas)):
+                for col in range(len(celdas[row])):
+                    celda = celdas[row][col]
+                    centro = celda.getPosicionCentro()
+                    draw.rect(ventana, celda.getColorCelda(), celda.getRect())
+                    if(celda.hayFicha() and not celda.sueltaFicha()):
+                        colorFicha = celda.getColorFicha()
+                        gfxdraw.aacircle(ventana, *centro, 15, colorFicha)
+                        gfxdraw.filled_circle(ventana, *centro, 15, colorFicha)
+            y = pos[1] + GRAVEDAD*pow(t, 2)
+            y = int(y)
+            t = t + RESOLUCION
+            nuevaPos = (pos[0], y)
+            if(celdaInicio.hayFicha()):
+                colorFicha = celdaInicio.getColorFicha()
+                gfxdraw.aacircle(ventana, *nuevaPos, 15, colorFicha)
+                gfxdraw.filled_circle(ventana, *nuevaPos, 15, colorFicha)
+            print(y)
 
-    def pasarFichasEntreCeldasPorColumna(self, n, col, ventana):
+    def pasarFichasEntreCeldasPorColumna(self, n, col, ventana, colorFondo):
         ''' 'n' es la fila desde la que empieza el recorrido.\n
         'col' es la columna actual'''
         celdas = self.__celdas
@@ -168,14 +199,17 @@ class Tablero:
                 j = i
                 while(j != n):
                     if(not celdas[j+1][col].hayFicha()):
+                        self.__celdas[j][col].setSueltaFicha(True)
+                        self.fichasCaen(ventana, colorFondo, j, col)
                         self.__celdas[j][col].pasarFicha(self.__celdas[j+1][col])
                         self.actualizarFilaCaenFichas(ventana, self.__celdas[j])
                         self.actualizarFilaCaenFichas(ventana, self.__celdas[j+1])
                     j = j + 1
 
-    def pasarFichasEntreCeldas(self, ventana):
+    def pasarFichasEntreCeldas(self, ventana, colorFondo):
         for col in range(N_CELDAS):
-            self.pasarFichasEntreCeldasPorColumna(N_CELDAS-1, col, ventana)     
+            self.pasarFichasEntreCeldasPorColumna(N_CELDAS-1, col, ventana, colorFondo)
+        self.enviarActualizacionAlineaciones()
 
     def enviarActualizacionAlineaciones(self):
         '''Tras un pasaje de fichas por un alineacion,
@@ -217,11 +251,10 @@ class Tablero:
         self.actualizarConFichas(ventana)
         '''Las celdas se pasan las fichas.'''
         '''Las fichas caen'''
-        self.pasarFichasEntreCeldas(ventana)
+        # self.pasarFichasEntreCeldas(ventana)
         '''Se transmite la nueva información al calculador'''
-        self.enviarActualizacionAlineaciones()
-        self.actualizarTableroCaenFichas(ventana)
-        self.rellenarCeldasPorColumna(ventana)
+        # self.enviarActualizacionAlineaciones()
+        # self.rellenarCeldasPorColumna(ventana)
         self.__matches = False
 
     def actualizarTableroCompleto(self, ventana, x_celda, x_espaciado, fichas):
@@ -267,7 +300,7 @@ class Tablero:
                                            fichas)
         else:
             if(self.__matches):
-                fichas = self.alineacionEnTablero(ventana)
+                return self.__matches
             fichas = self.handler.requestFichas(N_CELDAS)
             self.actualizarTableroCompleto(ventana, X_CELDA, 5, fichas)
             self.__matches = self.buscarAlineacionFichas()
@@ -300,7 +333,7 @@ class Tablero:
                 break
             for col in range(len(fichas[row])):
                 celda = self.__celdas[row][col]
-                if(celda.esClickeada(x, y)):
+                if(celda.esClickeada(x, y) and celda.hayFicha()):
                     dentroCuadricula = True
                     print(f'Se clickeó la celda {(row, col)}')
                     estadoFicha = self.handler.seleccionFichasYEstado(row, col)
