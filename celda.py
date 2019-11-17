@@ -8,7 +8,23 @@ class Celda(object):
     def __init__(self, x, y, posx=0, posy=0, color=(10, 10, 10)):
         self.__rect = Rect(posx, posy, x, y)
         self.__color = color
+        self.__coord = ()
         self.__ficha = None
+# //
+# Get - Set
+# //
+
+    def setCoord(self, x, y):
+        '''Setea el indice que ocupa la celda 
+        en el tablero. Esta informacion es
+        util para la logica de pasaje de fichas'''
+        self.__coord = (x, y)
+    
+    def getCoord(self):
+        '''Devuelve el indice que ocupa la celda
+        en el tablero'''
+        return self.__coord
+
 # //
 # Metodos sobre las fichas
 # //
@@ -46,6 +62,12 @@ class Celda(object):
     def getFicha(self):
         return self.__ficha
 
+    def hayFicha(self):
+        return self.__ficha is not None
+
+    def borrarFicha(self):
+        self.__ficha = None
+
 # //
 # Métodos sobre la celda
 # //
@@ -70,3 +92,13 @@ class Celda(object):
         a esta celda fue clickeado (si collidepoint
         de pygame retorna True)'''
         return self.__rect.collidepoint(x, y)
+
+    def pasarFicha(self, celda):
+        '''Pasa su ficha a la celda que se pasa
+        como argumento.'''
+        if(self.__ficha is None):
+            print(f'La celda {self.getCoord()} no tiene ninguna ficha')
+        else:
+            ficha = self.getFicha()
+            celda.setFicha(ficha=ficha)
+            self.__ficha = None

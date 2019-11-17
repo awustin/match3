@@ -95,10 +95,15 @@ class Handler(object):
         self.__calculador.logicaSeleccionFichas(x, y, estadoFicha)
         return estadoFicha
 
-    def logicaAlineacionFichas(self):
+    def buscarAlineaciones(self):
         '''Pide al calculador que busque alineaciones.
         Retorna False si no encuentra.'''
         return self.__calculador.logicaAlineacionFichas()
+
+    def anularFichasAlineadas(self):
+        '''Pide al calculador que ponga en -1 todas las
+        fichas alienadas. Devuelve False si no se anulo nada.'''
+        return self.__calculador.logicaEliminacionFichas()
 
     def logicaReemplazoFichas(self):
         '''Pide al calculador que reemplace las fichas que
@@ -108,3 +113,18 @@ class Handler(object):
     def reiniciarCalculador(self):
         self.__calculador.limpiarFichasSeleccionadas()
         self.__calculador.vaciarMatrizFichasEnteros()
+
+    def enviarConfiguracionTablero(self, fichas):
+        self.__calculador.setFichas(fichas)
+
+    def requestRellenoColumna(self, col):
+        columnaFichas = []
+        columna = self.__calculador.rellenoFichasPorColumna(col)
+        for i in columna:
+            if(i == -1 or i is None):
+                ficha = None
+            else:
+                ficha = Ficha(i)
+            columnaFichas.append(ficha)
+        return columnaFichas
+

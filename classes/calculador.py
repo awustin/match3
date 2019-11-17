@@ -10,6 +10,9 @@ class Calculador(object):
         self.__alineaciones = Alineacion()
         # fichasSeleccionadas: maximo dos simultaneamente
 
+    def setFichas(self, fichas):
+        self.__fichas = fichas
+
     def getFichas(self):
         return self.__fichas
 
@@ -129,21 +132,26 @@ class Calculador(object):
         fichas[x1][y1] = fichas[x2][y2]
         fichas[x2][y2] = aux
 
-    def logicaEliminacionFichas(self, alineH, alineV):
+    def logicaEliminacionFichas(self):
         '''Pone en -1 todos los lugares donde
         se encontraron alineaciones'''
-        if(alineH != []):
-            for alineacion in alineH:
+        seAnularon = False
+        alineaciones = self.__alineaciones
+        if(alineaciones.hayHorizontales()):
+            seAnularon = True
+            for alineacion in alineaciones.getHorizontales():
                 for ficha in alineacion:
                     x = ficha[0]
                     y = ficha[1]
                     self.__fichas[x][y] = -1
-        if(alineV != []):
-            for alineacion in alineV:
+        if(alineaciones.hayVerticales()):
+            seAnularon = True
+            for alineacion in alineaciones.getVerticales():
                 for ficha in alineacion:
                     x = ficha[0]
                     y = ficha[1]
                     self.__fichas[x][y] = -1
+        return seAnularon
 
     def logicaAlineacionFichas(self):
         '''Se encarga de:\n
@@ -156,7 +164,6 @@ class Calculador(object):
         alineacionesV = self.__alineaciones.buscarVerticales(self.__fichas, 3)
         if(alineacionesH != [] or alineacionesV != []):
             hayMatches = True
-            self.logicaEliminacionFichas(alineacionesH, alineacionesV)
         return hayMatches
 
     def logicaReemplazoFichas(self):
@@ -166,3 +173,14 @@ class Calculador(object):
             for col in range(len(self.__fichas[row])):
                 if(self.__fichas[row][col] == -1):
                     self.__fichas[row][col] = self.generarFichaRan()
+
+    def rellenoFichasPorColumna(self, col):
+        columna = []
+        for i in range(len(self.__fichas)):
+            if(self.__fichas[i][col] == -1 
+               or self.__fichas[i][col] is None):
+                columna.append(self.generarFichaRan())
+            else:
+                columna.append(self.__fichas[i][col])
+        return columna
+
