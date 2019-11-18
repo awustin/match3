@@ -5,11 +5,13 @@ from random import random
 from pygame import time
 from pygame import mouse
 from pygame import event
+from pygame import sprite
 import globales
 import customEnums
 from pantalla import Pantalla
 from texto import Texto
 from tablero import Tablero
+from ficha import Ficha
 
 
 class App:
@@ -40,6 +42,8 @@ class App:
                 if evento.type == pygame.KEYDOWN:
                     if(evento.key == pygame.K_RETURN):
                         self.partida()
+                    if(evento.key == pygame.K_t):
+                        self.test()
             self.pantalla.colorFondo(globales.COLOR_FONDO)
             self.pantalla.dibujar(mjeInicio.getSurface(),
                                   mjeInicio.getPosicion())
@@ -79,6 +83,36 @@ class App:
                 self.tablero.rellenarCeldasPorColumna(self.pantalla.getDisplay())
             if(mostrarInfo):
                 self.pantalla.dibujar(infoXY.getSurface(), (0, 0))
+            pygame.display.update()
+
+    def test(self):
+        gameOver = False
+        colorPpal = (100, 100, 100)
+        print("Test...")
+        fichas = []
+        grupo_fichas = sprite.Group()
+        for i in range(1, 5):
+            ficha = Ficha(idTipo=i, x=40*(i-1))
+            fichas.append(ficha)
+        for ficha in fichas:
+            grupo_fichas.add(ficha)
+        fichas[0].setCae(True, 300, 0.5)
+        fichas[1].setCae(True, 400, 1)
+        fichas[2].setCae(True, 350, 0.9)
+        fichas[3].setCae(True, 375, 1.3)
+        grupo_fichas.draw(self.pantalla.getDisplay())
+        while(not gameOver):
+            for evento in event.get():
+                if(evento.type == pygame.QUIT):
+                    print('Quiting...')
+                    gameOver = True
+                    pygame.quit()
+                    quit()
+                if(evento.type == pygame.KEYDOWN):
+                    if(evento.key == pygame.K_a):
+                        return
+            self.pantalla.colorFondo(colorPpal)
+            grupo_fichas.update(self.pantalla.getDisplay())
             pygame.display.update()
 
 

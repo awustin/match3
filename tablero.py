@@ -188,7 +188,6 @@ class Tablero:
                 colorFicha = celdaInicio.getColorFicha()
                 gfxdraw.aacircle(ventana, *nuevaPos, 15, colorFicha)
                 gfxdraw.filled_circle(ventana, *nuevaPos, 15, colorFicha)
-            print(y)
 
     def pasarFichasEntreCeldasPorColumna(self, n, col, ventana, colorFondo):
         ''' 'n' es la fila desde la que empieza el recorrido.\n
@@ -224,7 +223,6 @@ class Tablero:
                     enteros[row].append(tipo)
                 else:
                     enteros[row].append(-1)
-        print(enteros)
         self.handler.enviarConfiguracionTablero(enteros)
 
     def actualizarConFichas(self, ventana):
