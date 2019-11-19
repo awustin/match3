@@ -52,7 +52,6 @@ class App:
 
     def partida(self):
         gameOver = False
-        mostrarInfo = False
         colorPpal = (120, 100, 50)
         print("Presionó ENTER")
         while(not gameOver):
@@ -71,18 +70,14 @@ class App:
                         print("Recargando tablero...")
                 if(evento.type == pygame.MOUSEBUTTONDOWN):
                     if(mouse.get_pressed()[0] == 1):
-                        infoXY = Texto(mouse.get_pos(), globales.FONT_INFO,
-                                       (0, 0, 0), customEnums.TipoTexto.INFO)
                         self.tablero.clickXY(*mouse.get_pos())
-                        mostrarInfo = True
             self.pantalla.colorFondo(colorPpal)
             fichasCaen = self.tablero.actualizarTableroConEstado(self.pantalla.getDisplay())
             if(fichasCaen):
                 self.tablero.alineacionEnTablero(self.pantalla.getDisplay())
-                self.tablero.pasarFichasEntreCeldas(self.pantalla.getDisplay(), colorPpal)
-                self.tablero.rellenarCeldasPorColumna(self.pantalla.getDisplay())
-            if(mostrarInfo):
-                self.pantalla.dibujar(infoXY.getSurface(), (0, 0))
+                # TODO: REFACTOR
+                #self.tablero.pasarFichasEntreCeldas(self.pantalla.getDisplay(), colorPpal)
+                #self.tablero.rellenarCeldasPorColumna(self.pantalla.getDisplay())
             pygame.display.update()
 
     def test(self):

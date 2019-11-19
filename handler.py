@@ -34,7 +34,7 @@ class Handler(object):
                 for col in range(len(enteros[row])):
                     if(enteros[row][col] != -1):
                         idTipo = enteros[row][col]
-                        ficha = Ficha(idTipo)
+                        ficha = Ficha(idTipo=idTipo)
                     else:
                         ficha = None
                     fichas[row].append(ficha)

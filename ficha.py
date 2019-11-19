@@ -147,6 +147,9 @@ class Ficha(pygame.sprite.Sprite):
                 self.__cae = False
                 self.rect.centery = self.equilibrio
             ventana.blit(self.image, self.rect)
+        elif(self.__seleccionada):
+            pass
+            # Animacion de seleccionada
         else:
             self.t = 0
             self.t_rebote = 0

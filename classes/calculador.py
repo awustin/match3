@@ -113,6 +113,7 @@ class Calculador(object):
                 print("Swapping: [%d, %d] con [%d, %d]" % (x, y, *primerItem))
                 self.swapFichas(*primerItem, *(x, y))
                 estado['swap'] = True
+                estado['anterior'] = primerItem
         else:
             print("Hay mas de 2 fichas seleccionadas")
             estado['seleccionada'] = False
