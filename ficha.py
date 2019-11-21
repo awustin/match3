@@ -28,6 +28,9 @@ class Ficha(pygame.sprite.Sprite):
         self.y_final = self.y_inicial + 100
         self.equilibrio = self.rect.centery
         self.__cae = False
+        self.__lugaresQueCae = 0
+        self.__celdaDestino = None
+        self.__celdaOrigen = None
         self.__color = self.setColor()
 
 #  //
@@ -73,14 +76,17 @@ class Ficha(pygame.sprite.Sprite):
     def setY(self, y):
         self.rect.y = y
 
-    def setCae(self, valor, y_final=100, v_inicial=0):
-        if(valor):
-            self.setPosicionFinalCaida(y_final)
-            self.setVelocidadInicial(v_inicial)
+    def setCae(self, valor):
         self.__cae = valor
     
     def estaCayendo(self):
         return self.__cae
+
+    def setLugaresQueCae(self, valor):
+        self.__lugaresQueCae = valor
+
+    def lugaresQueCae(self):
+        return self.__lugaresQueCae
 
     def setVelocidadInicial(self, velocidad):
         '''En pixeles por frame'''
@@ -105,6 +111,18 @@ class Ficha(pygame.sprite.Sprite):
 
     def getPosicionCentro(self):
         return self.rect.center
+
+    def setCeldaDestino(self, celda):
+        self.__celdaDestino = celda
+
+    def getCeldaDestino(self):
+        return self.__celdaDestino
+
+    def setCeldaOrigen(self, celda):
+        self.__celdaOrigen = celda
+
+    def getCeldaOrigen(self):
+        return self.__celdaOrigen
 
 # //
 # Métodos para manipular el estado de la ficha
@@ -134,19 +152,10 @@ class Ficha(pygame.sprite.Sprite):
 
     def update(self, ventana):
         '''Caida: hasta una posición final'''
-        if(self.estaCayendo() and self.rect.centery <= self.y_final):
+        if(self.estaCayendo() and self.rect.centery < self.y_final):
             self.grav(self.t)
             self.t += 1
             self.equilibrio = self.rect.centery
-            ventana.blit(self.image, self.rect)
-        elif(self.estaCayendo() and self.rect.centery > self.y_final):
-            if(self.t_rebote < 314/2):
-                self.rebote(self.t_rebote)
-                self.t_rebote += 1
-            else:
-                self.__cae = False
-                self.rect.centery = self.equilibrio
-            ventana.blit(self.image, self.rect)
         elif(self.__seleccionada):
             pass
             # Animacion de seleccionada
@@ -156,6 +165,7 @@ class Ficha(pygame.sprite.Sprite):
             self.v_inicial = 0
             self.y_inicial = self.rect.centery
             self.equilibrio = self.rect.centery
+            self.__cae = False
         ventana.blit(self.image, self.rect)
 
     def grav(self, t):
@@ -164,6 +174,4 @@ class Ficha(pygame.sprite.Sprite):
     
     def rebote(self, t):
         y = self.equilibrio + (math.sin(0.01*2*t))*7*GRAVEDAD
-        print(y)
         self.rect.centery = y
-        pass

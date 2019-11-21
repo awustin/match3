@@ -72,12 +72,11 @@ class App:
                     if(mouse.get_pressed()[0] == 1):
                         self.tablero.clickXY(*mouse.get_pos())
             self.pantalla.colorFondo(colorPpal)
-            fichasCaen = self.tablero.actualizarTableroConEstado(self.pantalla.getDisplay())
-            if(fichasCaen):
-                self.tablero.alineacionEnTablero(self.pantalla.getDisplay())
-                # TODO: REFACTOR
-                #self.tablero.pasarFichasEntreCeldas(self.pantalla.getDisplay(), colorPpal)
-                #self.tablero.rellenarCeldasPorColumna(self.pantalla.getDisplay())
+            hayAlineaciones = self.tablero.actualizarTableroConEstado(
+                                          self.pantalla.getDisplay())
+            if(hayAlineaciones):
+                self.tablero.alineacionEnTablero(self.pantalla.getDisplay(),
+                                                 colorPpal)
             pygame.display.update()
 
     def test(self):
@@ -91,10 +90,10 @@ class App:
             fichas.append(ficha)
         for ficha in fichas:
             grupo_fichas.add(ficha)
-        fichas[0].setCae(True, 300, 0.5)
-        fichas[1].setCae(True, 400, 1)
-        fichas[2].setCae(True, 350, 0.9)
-        fichas[3].setCae(True, 375, 1.3)
+        fichas[0].setCae(True)
+        fichas[1].setCae(True)
+        fichas[2].setCae(True)
+        fichas[3].setCae(True)
         grupo_fichas.draw(self.pantalla.getDisplay())
         while(not gameOver):
             for evento in event.get():

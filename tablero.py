@@ -2,7 +2,6 @@
 # Celdas de 50x50 (8x8 celdas)
 import pygame
 from pygame import draw
-from pygame import gfxdraw
 from pygame import time
 from pygame import sprite
 from handler import Handler
@@ -17,8 +16,7 @@ X_OFF = (globales.DIMENSION[0] - X_CUAD) / 2
 Y_OFF = (globales.DIMENSION[1] - Y_CUAD) / 2
 N_CELDAS = 8
 X_CELDA = X_CUAD/N_CELDAS
-GRAVEDAD = 0.5
-RESOLUCION = 1
+VELOCIDAD_CAIDA = 2.5
 
 
 class Tablero:
@@ -28,8 +26,12 @@ class Tablero:
         self.__celdas = []
         self.__celdasEstanCompletas = False
         self.__grupoFichas = sprite.Group()
+        self.__buscarAlineaciones = True
+        self.__alineaciones = []
         self.__matches = False
         self.__seAnularon = False
+        self.__fichasEntreCeldas = []
+        self.__estanCayendo = False
 
     def setCompleto(self, completo):
         '''Asigna valor a la bandera para ver si
@@ -45,6 +47,11 @@ class Tablero:
         '''Asigna valor a la bandera para ver si
         se encontraron alineaciones'''
         self.__matches = matches
+
+    def setBuscarAlineaciones(self, valor):
+        '''Bandera para indicar si se deben buscar
+        alineaciones o no.'''
+        self.__buscarAlineaciones = valor
 
     def reiniciarMatrizCeldas(self):
         self.__celdas.clear()
@@ -68,6 +75,8 @@ class Tablero:
         self.reiniciarCalculador()
         self.setCompleto(False)
         self.setMatches(False)
+        self.setBuscarAlineaciones(True)
+        self.__grupoFichas.empty()
         self.__color_base = (random()*255, random()*255, random()*255)
 
     def gradiente(self, color):
@@ -126,90 +135,46 @@ class Tablero:
     def buscarAlineacionFichas(self):
         '''Pide que se determinen las alineaciones.
         El calculador revisa su lista de alineaciones'''
-        return self.handler.buscarAlineaciones()
+        self.enviarActualizacionAlineaciones()
+        if(self.__alineaciones == []):
+            alineaciones = self.handler.buscarAlineaciones()
+            if(not alineaciones):
+                return False
+            else:
+                self.__alineaciones = alineaciones
+                return True
+        else:
+            return True
 
-    def anularFichasAlineadas(self):
-        '''Pide que se anulen las fichas alineadas.
-        Las setea en -1.'''
-        self.__seAnularon = self.handler.anularFichasAlineadas()
-
-    def actualizarFilaCaenFichas(self, ventana, celdas):
-        '''Actualiza la fila mientras caen fichas'''
-        rect = []
-        for celda in celdas:
-            rect.append(celda.getRect())
-        pygame.display.update(rect)
-        for celda in celdas:
-            centro = celda.getPosicionCentro()
-            if(celda.hayFicha()):
-                colorFicha = celda.getColorFicha()
-                gfxdraw.aacircle(ventana, *centro, 15, colorFicha)
-                gfxdraw.filled_circle(ventana, *centro, 15, colorFicha)
-            pygame.display.update()
-
-    def actualizarTableroCaenFichas(self, ventana):
-        '''Actualiza el tablero sin pedir al calculador la
-        matriz de fichas. Sirve para estados de transición como
+    def actualizarTableroCaenFichas(self, ventana, colorFondo):
+        '''Actualiza el tablero para la transición de
         la caida de fichas'''
-        celdas = self.__celdas
-        for row in range(len(celdas)):
-            for col in range(len(celdas[row])):
-                celda = celdas[row][col]
-                centro = celda.getPosicionCentro()
-                draw.rect(ventana, celda.getColorCelda(), celda.getRect())
-                if(celda.hayFicha()):
-                    colorFicha = celda.getColorFicha()
-                    gfxdraw.aacircle(ventana, *centro, 15, colorFicha)
-                    gfxdraw.filled_circle(ventana, *centro, 15, colorFicha)
-
-    def fichasCaen(self, ventana, colorFondo, row, col):
-        celdas = self.__celdas
-        celdaInicio = self.__celdas[row][col]
-        celdaFinal = self.__celdas[row+1][col]
-        pos = celdaInicio.getPosicionCentro()
-        final = celdaFinal.getPosicionCentro()
-        t = 0
-        y = pos[1]
-        while(y <= final[1]):
+        while(self.__estanCayendo):
             ventana.fill(colorFondo)
+            celdas = self.__celdas
             for row in range(len(celdas)):
                 for col in range(len(celdas[row])):
                     celda = celdas[row][col]
-                    centro = celda.getPosicionCentro()
                     draw.rect(ventana, celda.getColorCelda(), celda.getRect())
-                    if(celda.hayFicha() and not celda.sueltaFicha()):
-                        colorFicha = celda.getColorFicha()
-                        gfxdraw.aacircle(ventana, *centro, 15, colorFicha)
-                        gfxdraw.filled_circle(ventana, *centro, 15, colorFicha)
-            y = pos[1] + GRAVEDAD*pow(t, 2)
-            y = int(y)
-            t = t + RESOLUCION
-            nuevaPos = (pos[0], y)
-            if(celdaInicio.hayFicha()):
-                colorFicha = celdaInicio.getColorFicha()
-                gfxdraw.aacircle(ventana, *nuevaPos, 15, colorFicha)
-                gfxdraw.filled_circle(ventana, *nuevaPos, 15, colorFicha)
+            for ficha in self.__grupoFichas:
+                self.__estanCayendo = False
+                if(ficha.estaCayendo()):
+                    self.__estanCayendo = True
+                    break
+            self.__grupoFichas.update(ventana)
+            pygame.display.update()
 
-    def pasarFichasEntreCeldasPorColumna(self, n, col, ventana, colorFondo):
-        ''' 'n' es la fila desde la que empieza el recorrido.\n
-        'col' es la columna actual'''
-        celdas = self.__celdas
-        for i in reversed(range(n)):
-            if(celdas[i][col].hayFicha()):
-                j = i
-                while(j != n):
-                    if(not celdas[j+1][col].hayFicha()):
-                        self.__celdas[j][col].setSueltaFicha(True)
-                        self.fichasCaen(ventana, colorFondo, j, col)
-                        self.__celdas[j][col].pasarFicha(self.__celdas[j+1][col])
-                        self.actualizarFilaCaenFichas(ventana, self.__celdas[j])
-                        self.actualizarFilaCaenFichas(ventana, self.__celdas[j+1])
-                    j = j + 1
-
-    def pasarFichasEntreCeldas(self, ventana, colorFondo):
-        for col in range(N_CELDAS):
-            self.pasarFichasEntreCeldasPorColumna(N_CELDAS-1, col, ventana, colorFondo)
-        self.enviarActualizacionAlineaciones()
+    def asignarANuevasCeldas(self, columnas):
+        '''A las fichas que ya existen y ya cayeron,
+        les es asignada su celda destino'''
+        for col in columnas:
+            for row in reversed(range(N_CELDAS)):
+                ficha = self.__celdas[row][col].getFicha()
+                if(ficha is not None):
+                    celdaDestino = ficha.getCeldaDestino()
+                    if(celdaDestino is not None):
+                        celdaOrigen = ficha.getCeldaOrigen()
+                        celdaOrigen.pasarFicha(celdaDestino)
 
     def enviarActualizacionAlineaciones(self):
         '''Tras un pasaje de fichas por un alineacion,
@@ -225,40 +190,82 @@ class Tablero:
                 else:
                     enteros[row].append(-1)
         self.handler.enviarConfiguracionTablero(enteros)
+        return enteros
 
-    def actualizarConFichas(self, ventana):
-        fichas = self.handler.requestFichas(N_CELDAS)
-        self.actualizarTableroCompleto(ventana, X_CELDA, 5, fichas)
-        pygame.display.update()
-        return fichas
-
-    def rellenarCeldasPorColumna(self, ventana):
-        '''En cada columna, pone nuevas fichas'''
+    def ocuparAgujeros(self, ventana, colorFondo, columnas):
+        '''Las fichas eliminadas dejan agujeros.
+        las fichas que estan encima, empiezan a caer ocupando
+        su lugar\n
+        Usa la lista de tuplas (celdaOrigen, celdaDestino)
+        entre las que se deben pasar las fichas'''
         celdas = self.__celdas
-        self.enviarActualizacionAlineaciones()
-        for col in range(N_CELDAS):
-            columnaFichasNuevas = self.handler.requestRellenoColumna(col)
-            for i in reversed(range(len(columnaFichasNuevas))):
-                ficha = columnaFichasNuevas[i]
-                if(not celdas[i][col].hayFicha()):
-                    self.__celdas[i][col].setFicha(ficha=ficha)
-                    self.actualizarFilaCaenFichas(ventana, self.__celdas[i])
-        self.enviarActualizacionAlineaciones()
+        for col in columnas:
+            for row in range(N_CELDAS):
+                celdaOrigen = celdas[row][col]
+                if(celdaOrigen.hayFicha()):
+                    agujerosDebajo = 0
+                    j = row
+                    while(j < N_CELDAS):
+                        if(not celdas[j][col].hayFicha()):
+                            agujerosDebajo += 1
+                        j += 1
+                    if(agujerosDebajo != 0):
+                        celdaDestino = self.__celdas[row + agujerosDebajo][col]
+                        celdaOrigen.getFicha().setPosicionFinalCaida(
+                                              celdaDestino.
+                                              getPosicionCentro()[1])
+                        celdaOrigen.getFicha().setVelocidadInicial(
+                                               VELOCIDAD_CAIDA)
+                        celdaOrigen.getFicha().setCae(True)
+                        celdaOrigen.getFicha().setCeldaOrigen(celdaOrigen)
+                        celdaOrigen.getFicha().setCeldaDestino(celdaDestino)
+                        self.__estanCayendo = True
+        self.actualizarTableroCaenFichas(ventana, colorFondo)
+        self.asignarANuevasCeldas(columnas)
 
-    def alineacionEnTablero(self, ventana):
-        self.anularFichasAlineadas()
-        self.actualizarConFichas(ventana)
-        '''Las celdas se pasan las fichas.'''
-        '''Las fichas caen'''
-        '''Se transmite la nueva información al calculador'''
+    def eliminarFichasAlineadas(self):
+        '''Elimina las fichas que se alinearon,
+        y devuelve un conjunto con las columnas
+        que tienen agujeros'''
+        horizontales = self.__alineaciones[0]
+        verticales = self.__alineaciones[1]
+        columnasConAgujeros = set()
+        for alineacion in horizontales:
+            for item in alineacion:
+                row = item[0]
+                col = item[1]
+                ficha = self.__celdas[row][col].getFicha()
+                ficha.kill()
+                self.__celdas[row][col].borrarFicha()
+                columnasConAgujeros.add(col)
+        for alineacion in verticales:
+            for item in alineacion:
+                row = item[0]
+                col = item[1]
+                if(self.__celdas[row][col].hayFicha()):
+                    ficha = self.__celdas[row][col].getFicha()
+                    ficha.kill()
+                    self.__celdas[row][col].borrarFicha()
+                columnasConAgujeros.add(col)
+        self.__alineaciones = []
+        self.__seAnularon = True
+        return columnasConAgujeros
+
+    def alineacionEnTablero(self, ventana, colorFondo):
+        self.__buscarAlineaciones = False
+        if(self.__alineaciones != []):
+            print('Match!...')
+            columnas = self.eliminarFichasAlineadas()
+            self.ocuparAgujeros(ventana, colorFondo, columnas)
+            enteros = self.enviarActualizacionAlineaciones()
+            print(enteros)
+        self.__alineaciones = []
         self.__matches = False
 
-    def actualizarTableroCompleto(self, ventana, x_celda, x_espaciado, fichas):
-        '''Actualiza el tablero.
-        Si no está completo (no se dibujaron todas las celdas),
-        se crean instancias de Celda.
+    def actualizarTableroCompleto(self, ventana, x_celda, x_espaciado):
+        '''Actualiza el tablero. Sin pedir fichas al calculador.
         Si está completo (ya se dibujaron todas las celdas),
-        recorre la matriz de celdas en busca de cambios de 
+        recorre la matriz de celdas en busca de cambios de
         estado.
         ventana es una Surface
         x_celda el tamaño de la celda cuadrada.
@@ -269,22 +276,13 @@ class Tablero:
         for row in range(len(celdas)):
             for col in range(len(celdas[row])):
                 celda = celdas[row][col]
-                if(fichas[row][col] is not None):
+                if(celda.hayFicha()):
                     '''La ficha existe'''
-                    if(not celda.getFicha().equals(fichas[row][col])):
-                        '''La ficha se intercambió'''
-                        celda.setFicha(fichas[row][col].getTipoInt())
-                        centro = celda.getPosicionCentro()
-                        celda.getFicha().setPosicionCentro(*centro)
-                        #self.agregarFichasAGrupo(celda.getFicha())
-                    centro = celda.getPosicionCentro()
-                    celda.getFicha().setPosicionCentro(*centro)
                     self.agregarFichasAGrupo(celda.getFicha())
-                    draw.rect(ventana, celda.getColorCelda(), celda.getRect())
                 else:
                     '''La ficha se eliminó'''
                     self.__celdas[row][col].borrarFicha()
-                    draw.rect(ventana, celda.getColorCelda(), celda.getRect())
+                draw.rect(ventana, celda.getColorCelda(), celda.getRect())
         self.__grupoFichas.update(ventana)
 
     def agregarFichasAGrupo(self, fichas):
@@ -303,16 +301,16 @@ class Tablero:
         El programa principal debe llamar a esta función en cada iteración'''        
         color_base = self.__color_base
         if(not self.__celdasEstanCompletas):
-            fichas = self.handler.requestFichas(N_CELDAS)  # refactor 1
+            fichas = self.handler.requestFichas(N_CELDAS)
             self.agregarFichasAGrupo(fichas)
             self.generarTableroFilaPorFila(ventana, X_CELDA, 5, color_base,
-                                           fichas)  # refactor 2
+                                           fichas)
         else:
             if(self.__matches):
                 return self.__matches
-            fichas = self.handler.requestFichas(N_CELDAS)  # refactor 1
-            self.actualizarTableroCompleto(ventana, X_CELDA, 5, fichas)  # refactor 3
-            self.__matches = self.buscarAlineacionFichas()
+            self.actualizarTableroCompleto(ventana, X_CELDA, 5)
+            if(self.__buscarAlineaciones):
+                self.__matches = self.buscarAlineacionFichas()
 
     def deseleccionarTodasCeldas(self):
         '''Recorre la matriz de celdas y deselecciona

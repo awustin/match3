@@ -48,6 +48,8 @@ class Celda(object):
             self.__ficha = ficha
         else:
             self.__ficha = ficha
+        centro = self.getPosicionCentro()
+        self.__ficha.setPosicionCentro(*centro)
 
     def seleccionarFicha(self):
         '''Marca la ficha correspondiente a\n

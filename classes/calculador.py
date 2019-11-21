@@ -160,12 +160,11 @@ class Calculador(object):
         Buscar alineaciones verticales,\n
         Poner en -1 las fichas alineadas.\n
         Devuelve False si no hay alineaciones'''
-        hayMatches = False
         alineacionesH = self.__alineaciones.buscarHorizontales(self.__fichas, 3)
         alineacionesV = self.__alineaciones.buscarVerticales(self.__fichas, 3)
         if(alineacionesH != [] or alineacionesV != []):
-            hayMatches = True
-        return hayMatches
+            return self.__alineaciones.getAlineaciones()
+        return False
 
     def logicaReemplazoFichas(self):
         '''Se encarga de colocar nuevos números en
