@@ -11,6 +11,7 @@ import customEnums
 from pantalla import Pantalla
 from texto import Texto
 from tablero import Tablero
+from selector import Selector
 from ficha import Ficha
 
 
@@ -28,6 +29,7 @@ class App:
         posY = self.pantalla.posicionCentrarY(self.mjeInicio.getSurface())
         self.mjeInicio.setPosicion(posX, posY)
         self.tablero = Tablero(color=(20, 40, 80))
+        self.selector = Selector(self.tablero)
 
     def ejecutar(self):
         clock = time.Clock()
@@ -53,7 +55,6 @@ class App:
     def partida(self):
         gameOver = False
         colorPpal = (120, 100, 50)
-        print("Presionó ENTER")
         while(not gameOver):
             for evento in event.get():
                 if(evento.type == pygame.QUIT):
@@ -62,21 +63,23 @@ class App:
                     quit()
                 if(evento.type == pygame.KEYDOWN):
                     if(evento.key == pygame.K_a):
+                        self.selector.setPos(0, 0)
                         self.tablero.reiniciaFichasCeldasTablero()
                         return
                     if(evento.key == pygame.K_r):
+                        self.selector.setPos(0, 0)
                         self.tablero.reiniciaFichasCeldasTablero()
                         colorPpal = (random()*255, random()*255, random()*255)
-                        print("Recargando tablero...")
                 if(evento.type == pygame.MOUSEBUTTONDOWN):
                     if(mouse.get_pressed()[0] == 1):
-                        self.tablero.clickXY(*mouse.get_pos())
+                        self.tablero.clickXY(*mouse.get_pos(), self.selector)
             self.pantalla.colorFondo(colorPpal)
             hayAlineaciones = self.tablero.actualizarTableroConEstado(
                                           self.pantalla.getDisplay())
             if(hayAlineaciones):
                 self.tablero.alineacionEnTablero(self.pantalla.getDisplay(),
                                                  colorPpal)
+            self.selector.update(self.pantalla.getDisplay())
             pygame.display.update()
 
     def test(self):

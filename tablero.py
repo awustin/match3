@@ -32,6 +32,10 @@ class Tablero:
         self.__fichasEntreCeldas = []
         self.__estanCayendo = False
 
+    def getCeldas(self):
+        '''Devuelve la matriz de celdas'''
+        return self.__celdas
+
     def setCompleto(self, completo):
         '''Asigna valor a la bandera para ver si
         se debe actualizar la matriz de celdas o no.
@@ -381,7 +385,7 @@ class Tablero:
         self.__celdas[x1][y1].setFicha(ficha=self.__celdas[x2][y2].getFicha())
         self.__celdas[x2][y2].setFicha(ficha=ficha1)
 
-    def clickXY(self, x, y):
+    def clickXY(self, x, y, selector):
         '''Busca cuál fue la casilla clickeada
         y dispara la lógica de selección de las fichas'''
         limpiar = False
@@ -395,6 +399,7 @@ class Tablero:
                 if(celda.esClickeada(x, y) and celda.hayFicha()):
                     dentroCuadricula = True
                     estadoFicha = self.handler.seleccionFichasYEstado(row, col)
+                    selector.setPos(row, col)
                     print(estadoFicha)
                     if(estadoFicha['seleccionada']):
                         celda.seleccionarFicha()
