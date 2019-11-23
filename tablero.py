@@ -36,21 +36,6 @@ class Tablero:
         '''Devuelve la matriz de celdas'''
         return self.__celdas
 
-    def setCompleto(self, completo):
-        '''Asigna valor a la bandera para ver si
-        se debe actualizar la matriz de celdas o no.
-        Si está completo (se dibujaron todas las celdas):
-        no se reinicia la matriz de celdas.
-        Si hubo cambios en las celdas (p ejemplo, al reiniciar
-        el tablero):
-        se reinicia la matriz de celdas'''
-        self.__celdasEstanCompletas = completo
-
-    def setMatches(self, matches):
-        '''Asigna valor a la bandera para ver si
-        se encontraron alineaciones'''
-        self.__matches = matches
-
     def reiniciarMatrizCeldas(self):
         self.__celdas.clear()
         self.__celdas = []
@@ -68,8 +53,8 @@ class Tablero:
         Pone las banderas en su estado inicial'''
         self.reiniciarMatrizCeldas()
         self.reiniciarCalculador()
-        self.setCompleto(False)
-        self.setMatches(False)
+        self.__matches = False
+        self.__celdasEstanCompletas = False
         self.__grupoFichas.empty()
         self.__color_base = (random()*255, random()*255, random()*255)
 
@@ -124,7 +109,7 @@ class Tablero:
                 pygame.display.update()
                 if(row == len(self.__celdas)-1
                    and col == len(self.__celdas[row])-1):
-                    self.setCompleto(True)
+                    self.__celdasEstanCompletas = True
 
     def buscarAlineacionFichas(self):
         '''Pide que se determinen las alineaciones.

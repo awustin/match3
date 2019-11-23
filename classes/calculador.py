@@ -167,24 +167,6 @@ class Calculador(object):
             return self.__alineaciones.getAlineaciones()
         return False
 
-    def logicaReemplazoFichas(self):
-        '''Se encarga de colocar nuevos números en
-        donde hay -1'''
-        for row in range(len(self.__fichas)):
-            for col in range(len(self.__fichas[row])):
-                if(self.__fichas[row][col] == -1):
-                    self.__fichas[row][col] = self.generarFichaRan()
-
-    def rellenoFichasPorColumna(self, col):
-        columna = []
-        for i in range(len(self.__fichas)):
-            if(self.__fichas[i][col] == -1
-               or self.__fichas[i][col] is None):
-                columna.append(self.generarFichaRan())
-            else:
-                columna.append(self.__fichas[i][col])
-        return columna
-
     def filaFichasNuevas(self, fila):
         '''Actualiza su matriz de fichas a medida que va
         generando filas nuevas'''

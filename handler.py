@@ -105,11 +105,6 @@ class Handler(object):
         fichas alienadas. Devuelve False si no se anulo nada.'''
         return self.__calculador.logicaEliminacionFichas()
 
-    def logicaReemplazoFichas(self):
-        '''Pide al calculador que reemplace las fichas que
-        están en -1'''
-        self.__calculador.logicaReemplazoFichas()
-
     def reiniciarCalculador(self):
         self.__calculador.limpiarFichasSeleccionadas()
         self.__calculador.vaciarMatrizFichasEnteros()
@@ -117,17 +112,6 @@ class Handler(object):
     def enviarConfiguracionTablero(self, fichas):
         self.__calculador.setFichas(fichas)
 
-    def requestRellenoColumna(self, col):
-        columnaFichas = []
-        columna = self.__calculador.rellenoFichasPorColumna(col)
-        for i in columna:
-            if(i == -1 or i is None):
-                ficha = None
-            else:
-                ficha = Ficha(i)
-            columnaFichas.append(ficha)
-        return columnaFichas
-    
     def requestNuevasFichasPorFila(self, fila):
         '''Pide al calculador nuevas fichas
         por fila.\n
