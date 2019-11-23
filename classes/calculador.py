@@ -183,3 +183,16 @@ class Calculador(object):
             else:
                 columna.append(self.__fichas[i][col])
         return columna
+
+    def filaFichasNuevas(self, fila):
+        '''Actualiza su matriz de fichas a medida que va
+        generando filas nuevas'''
+        nuevaFila = []
+        for col in range(len(self.__fichas[fila])):
+            if(self.__fichas[fila][col] == -1):
+                ficha = self.generarFichaRan()
+                nuevaFila.append(ficha)
+                self.__fichas[fila][col] = ficha
+            else:
+                nuevaFila.append(-1)
+        return nuevaFila

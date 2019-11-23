@@ -108,7 +108,7 @@ class Celda(object):
         '''Pasa su ficha a la celda que se pasa
         como argumento.'''
         if(self.__ficha is None):
-            print(f'La celda {self.getCoord()} no tiene ninguna ficha')
+            raise Exception(f'La celda {self.getCoord()} no tiene ninguna ficha')
         else:
             ficha = self.getFicha()
             celda.setFicha(ficha=ficha)

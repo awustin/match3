@@ -127,4 +127,21 @@ class Handler(object):
                 ficha = Ficha(i)
             columnaFichas.append(ficha)
         return columnaFichas
+    
+    def requestNuevasFichasPorFila(self, fila):
+        '''Pide al calculador nuevas fichas
+        por fila.\n
+        Instancia las fichas\n
+        Devuelve una fila de fichas y Nones.
+        None significa que ya existe una ficha en las celdas.'''
+        filaNueva = self.__calculador.filaFichasNuevas(fila)
+        fichasNuevas = []
+        for col in range(len(filaNueva)):
+            ficha = None
+            if(filaNueva[col] != -1):
+                ficha = Ficha(idTipo=filaNueva[col])
+            fichasNuevas.append(ficha)
+        return fichasNuevas
+            
+
 
