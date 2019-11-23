@@ -16,11 +16,11 @@ class Celda(object):
 # //
 
     def setCoord(self, x, y):
-        '''Setea el indice que ocupa la celda 
+        '''Setea el indice que ocupa la celda
         en el tablero. Esta informacion es
         util para la logica de pasaje de fichas'''
         self.__coord = (x, y)
-    
+
     def getCoord(self):
         '''Devuelve el indice que ocupa la celda
         en el tablero'''
@@ -30,7 +30,7 @@ class Celda(object):
         '''Devuelve True si esta haciendo un pasaje
         de fichas'''
         return self.__sueltaFicha
-    
+
     def setSueltaFicha(self, valor):
         self.__sueltaFicha = valor
 
@@ -108,7 +108,8 @@ class Celda(object):
         '''Pasa su ficha a la celda que se pasa
         como argumento.'''
         if(self.__ficha is None):
-            raise Exception(f'La celda {self.getCoord()} no tiene ninguna ficha')
+            raise Exception(
+                  f'La celda {self.getCoord()} no tiene ninguna ficha')
         else:
             ficha = self.getFicha()
             celda.setFicha(ficha=ficha)

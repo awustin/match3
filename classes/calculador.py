@@ -160,7 +160,8 @@ class Calculador(object):
         Buscar alineaciones verticales,\n
         Poner en -1 las fichas alineadas.\n
         Devuelve False si no hay alineaciones'''
-        alineacionesH = self.__alineaciones.buscarHorizontales(self.__fichas, 3)
+        alineacionesH = self.__alineaciones.buscarHorizontales(
+                                            self.__fichas, 3)
         alineacionesV = self.__alineaciones.buscarVerticales(self.__fichas, 3)
         if(alineacionesH != [] or alineacionesV != []):
             return self.__alineaciones.getAlineaciones()
@@ -177,7 +178,7 @@ class Calculador(object):
     def rellenoFichasPorColumna(self, col):
         columna = []
         for i in range(len(self.__fichas)):
-            if(self.__fichas[i][col] == -1 
+            if(self.__fichas[i][col] == -1
                or self.__fichas[i][col] is None):
                 columna.append(self.generarFichaRan())
             else:

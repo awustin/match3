@@ -241,7 +241,7 @@ class Tablero:
                 columnasConAgujeros.add(col)
         self.__alineaciones = []
         return columnasConAgujeros
-    
+
     def filaTieneAgujeros(self, fila):
         tieneAgujeros = False
         for celda in self.__celdas[fila]:
@@ -277,7 +277,8 @@ class Tablero:
             if(self.filaTieneAgujeros(row)):
                 nuevaFila = self.handler.requestNuevasFichasPorFila(row)
                 for col in range(len(nuevaFila)):
-                    posicionAparecen = self.__celdas[0][col].getPosicionCentro()
+                    posicionAparecen = self.__celdas[0][col]. \
+                                       getPosicionCentro()
                     if(nuevaFila[col] is not None):
                         ficha = nuevaFila[col]
                         celdaDestino = self.__celdas[row][col]
@@ -342,8 +343,8 @@ class Tablero:
 
     def actualizarTableroConEstado(self, ventana):
         ''' Actualiza el tablero, segun el estado de las fichas
-        y las alineaciones.
-        El programa principal debe llamar a esta función en cada iteración'''        
+        y las alineaciones.\n
+        El programa principal debe llamar a esta función en cada iteración'''
         color_base = self.__color_base
         if(not self.__celdasEstanCompletas):
             fichas = self.handler.requestFichas(N_CELDAS)
