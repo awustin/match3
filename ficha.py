@@ -5,8 +5,6 @@
 # Además su animación: gravedad
 import pygame
 from tipoficha import TipoFicha
-from customEnums import Colores
-import math
 
 GRAVEDAD = 2
 
@@ -23,12 +21,10 @@ class Ficha(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         self.t = 0
-        self.t_rebote = 0
         self.v_inicial = 0
         self.y_inicial = self.rect.centery
         self.y_final = self.y_inicial + 100
         self.equilibrio = self.rect.centery
-        self.__lugaresQueCae = 0
         self.__celdaDestino = None
         self.__celdaOrigen = None
 
@@ -56,24 +52,12 @@ class Ficha(pygame.sprite.Sprite):
         '''Asigna el tipo\n
         y setea el color correspondiente'''
         self.__tipo = tipo
-    
-    def setX(self, x):
-        self.rect.x = x
-
-    def setY(self, y):
-        self.rect.y = y
 
     def setCae(self, valor):
         self.__cae = valor
     
     def estaCayendo(self):
         return self.__cae
-
-    def setLugaresQueCae(self, valor):
-        self.__lugaresQueCae = valor
-
-    def lugaresQueCae(self):
-        return self.__lugaresQueCae
 
     def setVelocidadInicial(self, velocidad):
         '''En pixeles por frame'''
@@ -123,23 +107,16 @@ class Ficha(pygame.sprite.Sprite):
         if(self.estaCayendo() and self.rect.centery < self.y_final):
             self.grav(self.t)
             self.t += 1
-            self.equilibrio = self.rect.centery
         elif(self.__seleccionada):
             pass
             # Animacion de seleccionada
         else:
             self.t = 0
-            self.t_rebote = 0
             self.v_inicial = 0
             self.y_inicial = self.rect.centery
-            self.equilibrio = self.rect.centery
             self.__cae = False
         ventana.blit(self.image, self.rect)
 
     def grav(self, t):
         y = self.y_inicial + self.v_inicial*t + 0.5*GRAVEDAD*t
-        self.rect.centery = y
-    
-    def rebote(self, t):
-        y = self.equilibrio + (math.sin(0.01*2*t))*7*GRAVEDAD
         self.rect.centery = y
