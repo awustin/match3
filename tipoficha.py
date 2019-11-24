@@ -41,9 +41,6 @@ class TipoFicha(object):
 
     def getId(self):
         return self.__id
-
-    def getColor(self):
-        return self.__color
     
     def getImage(self):
         return self.__image

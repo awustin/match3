@@ -61,10 +61,6 @@ class Celda(object):
         "seleccionada" de la ficha'''
         self.__ficha.setSeleccionada(False)
 
-    def getColorFicha(self):
-        '''Devuelve el color de la ficha'''
-        return self.__ficha.getColor()
-
     def getFicha(self):
         return self.__ficha
 

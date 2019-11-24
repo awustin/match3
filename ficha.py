@@ -16,6 +16,7 @@ class Ficha(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.__seleccionada = False
         self.__intercambia = False
+        self.__cae = False
         self.__tipo = TipoFicha(idTipo)
         self.image = self.__tipo.getImage()
         self.rect = self.image.get_rect()
@@ -27,11 +28,9 @@ class Ficha(pygame.sprite.Sprite):
         self.y_inicial = self.rect.centery
         self.y_final = self.y_inicial + 100
         self.equilibrio = self.rect.centery
-        self.__cae = False
         self.__lugaresQueCae = 0
         self.__celdaDestino = None
         self.__celdaOrigen = None
-        self.__color = self.setColor()
 
 #  //
 #  Métodos get-set
@@ -44,7 +43,6 @@ class Ficha(pygame.sprite.Sprite):
         '''Asigna valor booleano\n
         y setea el color correspondiente'''
         self.__seleccionada = valor
-        self.setColor()
 
     def getTipo(self):
         return self.__tipo
@@ -58,7 +56,6 @@ class Ficha(pygame.sprite.Sprite):
         '''Asigna el tipo\n
         y setea el color correspondiente'''
         self.__tipo = tipo
-        self.setColor()
     
     def setX(self, x):
         self.rect.x = x
@@ -117,22 +114,6 @@ class Ficha(pygame.sprite.Sprite):
 # //
 # Métodos para manipular el estado de la ficha
 # //
-
-    def setColor(self):
-        '''Asigna el color a la ficha\n
-        teniendo en cuenta si está seleccionada,\n
-        alineada, o es No_especificada'''
-        if(self.__seleccionada):
-            self.__color = Colores.SELECCION.value
-            return Colores.SELECCION.value
-        else:
-            self.__color = self.__tipo.getColor().value
-            return self.__tipo.getColor().value
-
-    def getColor(self):
-        '''Devuelve el color de la ficha'''
-        self.setColor()
-        return self.__color
 
     def equals(self, otraFicha):
         return self.__tipo.getId() == otraFicha.getTipoInt()
