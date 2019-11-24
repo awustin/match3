@@ -61,11 +61,6 @@ class Celda(object):
         "seleccionada" de la ficha'''
         self.__ficha.setSeleccionada(False)
 
-    def setFichaAlineada(self, valor):
-        '''Marca la ficha de esta celda como\n
-        alineada (True) o no alineada (False)'''
-        self.__ficha.setAlineada(valor)
-
     def getColorFicha(self):
         '''Devuelve el color de la ficha'''
         return self.__ficha.getColor()

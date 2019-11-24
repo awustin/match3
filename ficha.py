@@ -15,7 +15,7 @@ class Ficha(pygame.sprite.Sprite):
     def __init__(self, idTipo=0, x=0, y=0):
         pygame.sprite.Sprite.__init__(self)
         self.__seleccionada = False
-        self.__alineada = False
+        self.__intercambia = False
         self.__tipo = TipoFicha(idTipo)
         self.image = self.__tipo.getImage()
         self.rect = self.image.get_rect()
@@ -59,16 +59,6 @@ class Ficha(pygame.sprite.Sprite):
         y setea el color correspondiente'''
         self.__tipo = tipo
         self.setColor()
-
-    def getAlineada(self):
-        return self.__alineada
-
-    def setAlineada(self, valor):
-        '''Asigna valor booleano\n
-        y setea el color correspondiente'''
-        if(valor):
-            self.setColor()
-        self.__alineada = valor
     
     def setX(self, x):
         self.rect.x = x
@@ -132,10 +122,7 @@ class Ficha(pygame.sprite.Sprite):
         '''Asigna el color a la ficha\n
         teniendo en cuenta si está seleccionada,\n
         alineada, o es No_especificada'''
-        if(self.__alineada):
-            self.__color = Colores.ALINEACION.value
-            return Colores.ALINEACION.value
-        elif(self.__seleccionada):
+        if(self.__seleccionada):
             self.__color = Colores.SELECCION.value
             return Colores.SELECCION.value
         else:
