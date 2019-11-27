@@ -31,6 +31,7 @@ class Tablero:
         self.__matches = False
         self.__fichasEntreCeldas = []
         self.__estanCayendo = False
+        self.__estanSwapping = False
 
     def getCeldas(self):
         '''Devuelve la matriz de celdas'''
@@ -364,13 +365,53 @@ class Tablero:
         self.deseleccionarTodasCeldas()
         self.__matches = False
 
-    def swapFichas(self, x1, y1, x2, y2):
-        '''Intercambia las fichas entre las celdas'''
-        ficha1 = self.__celdas[x1][y1].getFicha()
-        self.__celdas[x1][y1].setFicha(ficha=self.__celdas[x2][y2].getFicha())
-        self.__celdas[x2][y2].setFicha(ficha=ficha1)
+    def actualizarTableroSwapping(self, ventana, colorFondo, swapping):
+        '''Actualiza el tablero mientras se intercambian fichas'''
+        while(self.__estanSwapping):
+            ventana.fill(colorFondo)
+            celdas = self.__celdas
+            for row in range(len(celdas)):
+                for col in range(len(celdas[row])):
+                    celda = celdas[row][col]
+                    draw.rect(ventana, celda.getColorCelda(), celda.getRect())
+            for ficha in swapping:
+                if(ficha is not None):
+                    self.__estanSwapping = False
+                    if(ficha.estaIntercambiando()):
+                        self.__estanSwapping = True
+                        break
+            self.__grupoFichas.update(ventana)
+            pygame.display.update()
 
-    def clickXY(self, x, y, selector):
+    def swapFichas(self, ventana, colorFondo, x1, y1, x2, y2):
+        '''Intercambia las fichas entre las celdas'''
+        celda1 = self.__celdas[x1][y1]
+        celda2 = self.__celdas[x2][y2]
+        fichasSwapping = []
+        # Asignar ficha origen y destino: Ficha 1
+        ficha1 = celda1.getFicha()
+        ficha1.setCeldaOrigen(celda1)
+        ficha1.setCeldaDestino(celda2)
+        ficha1.setIntercambio(True)
+        # Asignar ficha origen y destino: Ficha 2
+        ficha2 = celda2.getFicha()
+        ficha2.setCeldaOrigen(celda2)
+        ficha2.setCeldaDestino(celda1)
+        ficha2.setIntercambio(True)
+        self.__estanSwapping = True
+        fichasSwapping.append(ficha1)
+        fichasSwapping.append(ficha2)
+        # Actualizar durante animacion
+        self.actualizarTableroSwapping(ventana, colorFondo, fichasSwapping)
+        # Setear celdaOrigen
+        ficha1.setCeldaOrigen(celda2)
+        ficha2.setCeldaOrigen(celda1)
+        ficha1.setCeldaDestino(None)
+        ficha2.setCeldaDestino(None)
+        celda1.setFicha(ficha=ficha2)
+        celda2.setFicha(ficha=ficha1)
+
+    def clickXY(self, x, y, selector, ventana, colorFondo):
         '''Busca cuál fue la casilla clickeada
         y dispara la lógica de selección de las fichas'''
         limpiar = False
@@ -395,7 +436,8 @@ class Tablero:
                         celda.deseleccionarFicha()
                     if(estadoFicha['swap']):
                         p0 = estadoFicha['anterior']
-                        self.swapFichas(row, col, p0[0], p0[1])
+                        self.swapFichas(ventana, colorFondo, row, col,
+                                        p0[0], p0[1])
                         self.enviarActualizacionAlineaciones()
                         limpiar = True
                         break

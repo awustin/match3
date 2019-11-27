@@ -72,7 +72,8 @@ class App:
                         colorPpal = (random()*255, random()*255, random()*255)
                 if(evento.type == pygame.MOUSEBUTTONDOWN):
                     if(mouse.get_pressed()[0] == 1):
-                        self.tablero.clickXY(*mouse.get_pos(), self.selector)
+                        self.tablero.clickXY(*mouse.get_pos(), self.selector,
+                                             self.pantalla.getDisplay(), colorPpal)
             self.pantalla.colorFondo(colorPpal)
             hayAlineaciones = self.tablero.actualizarTableroConEstado(
                                           self.pantalla.getDisplay())
@@ -89,14 +90,11 @@ class App:
         fichas = []
         grupo_fichas = sprite.Group()
         for i in range(1, 5):
-            ficha = Ficha(idTipo=i, x=40*(i-1))
+            ficha = Ficha(idTipo=i, x=60*(i-1))
             fichas.append(ficha)
         for ficha in fichas:
             grupo_fichas.add(ficha)
-        fichas[0].setCae(True)
-        fichas[1].setCae(True)
-        fichas[2].setCae(True)
-        fichas[3].setCae(True)
+        fichas[3].setIntercambio(True)
         grupo_fichas.draw(self.pantalla.getDisplay())
         while(not gameOver):
             for evento in event.get():

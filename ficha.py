@@ -7,14 +7,15 @@ import pygame
 from tipoficha import TipoFicha
 
 GRAVEDAD = 2
+V_INTERCAMBIO = 6
 
 
 class Ficha(pygame.sprite.Sprite):
     def __init__(self, idTipo=0, x=0, y=0):
         pygame.sprite.Sprite.__init__(self)
         self.__seleccionada = False
-        self.__intercambia = False
         self.__cae = False
+        self.__intercambia = False
         self.__tipo = TipoFicha(idTipo)
         self.image = self.__tipo.getImage()
         self.rect = self.image.get_rect()
@@ -24,21 +25,12 @@ class Ficha(pygame.sprite.Sprite):
         self.v_inicial = 0
         self.y_inicial = self.rect.centery
         self.y_final = self.y_inicial + 100
-        self.equilibrio = self.rect.centery
         self.__celdaDestino = None
         self.__celdaOrigen = None
 
 #  //
 #  Métodos get-set
 #  //
-
-    def getSeleccionada(self):
-        return self.__seleccionada
-
-    def setSeleccionada(self, valor):
-        '''Asigna valor booleano\n
-        y setea el color correspondiente'''
-        self.__seleccionada = valor
 
     def getTipo(self):
         return self.__tipo
@@ -52,12 +44,6 @@ class Ficha(pygame.sprite.Sprite):
         '''Asigna el tipo\n
         y setea el color correspondiente'''
         self.__tipo = tipo
-
-    def setCae(self, valor):
-        self.__cae = valor
-    
-    def estaCayendo(self):
-        return self.__cae
 
     def setVelocidadInicial(self, velocidad):
         '''En pixeles por frame'''
@@ -74,11 +60,10 @@ class Ficha(pygame.sprite.Sprite):
                   'No se puede cambiar la posicion final')
         else:
             self.y_final = y_final
-    
+
     def setPosicionCentro(self, x, y):
         self.rect.centerx = x
         self.rect.centery = y
-        self.equilibrio = y
 
     def getPosicionCentro(self):
         return self.rect.center
@@ -99,6 +84,54 @@ class Ficha(pygame.sprite.Sprite):
 # Métodos para manipular el estado de la ficha
 # //
 
+    def estaSeleccionada(self):
+        return self.__seleccionada
+
+    def setSeleccionada(self, valor):
+        '''Si valor es True, pone en True la bandera
+        de "seleccionada" y las demás banderas en False.\n
+        Si valor es False, pone todas en False'''
+        if(valor):
+            self.__seleccionada = valor
+            self.__cae = False
+            self.__intercambia = False
+        else:
+            self.__seleccionada = False
+            self.__cae = False
+            self.__intercambia = False
+
+    def estaCayendo(self):
+        return self.__cae
+
+    def setCae(self, valor):
+        '''Si valor es True, pone en True la bandera
+        de "cae" y las demás banderas en False.\n
+        Si valor es False, pone todas en False'''
+        if(valor):
+            self.__seleccionada = False
+            self.__cae = valor
+            self.__intercambia = False
+        else:
+            self.__seleccionada = False
+            self.__cae = False
+            self.__intercambia = False
+
+    def estaIntercambiando(self):
+        return self.__intercambia
+
+    def setIntercambio(self, valor):
+        '''Si valor es True, pone en True la bandera
+        de "intercambia" y las demás banderas en False.\n
+        Si valor es False, pone todas en False'''
+        if(valor):
+            self.__seleccionada = False
+            self.__cae = False
+            self.__intercambia = valor
+        else:
+            self.__seleccionada = False
+            self.__cae = False
+            self.__intercambia = False
+
     def equals(self, otraFicha):
         return self.__tipo.getId() == otraFicha.getTipoInt()
 
@@ -107,16 +140,49 @@ class Ficha(pygame.sprite.Sprite):
         if(self.estaCayendo() and self.rect.centery < self.y_final):
             self.grav(self.t)
             self.t += 1
-        elif(self.__seleccionada):
+        elif(self.estaSeleccionada()):
             pass
             # Animacion de seleccionada
+        elif(self.estaIntercambiando()):
+            if(self.t == 0):
+                self.p1 = pygame.math.Vector2(
+                          *self.__celdaOrigen.getPosicionCentro())
+                self.p2 = pygame.math.Vector2(
+                          *self.__celdaDestino.getPosicionCentro())
+            self.movCuadratico(self.t)
+            self.t += 1
         else:
             self.t = 0
             self.v_inicial = 0
             self.y_inicial = self.rect.centery
             self.__cae = False
+            self.__intercambia = False
+            self.__seleccionada = False
         ventana.blit(self.image, self.rect)
 
     def grav(self, t):
         y = self.y_inicial + self.v_inicial*t + 0.5*GRAVEDAD*t
         self.rect.centery = y
+
+    def movCuadratico(self, t):
+        # Obtengo direccion y modulo de v_intercambio
+        delta = self.p2 - self.p1
+        if(delta == (0, 0)):
+            self.setIntercambio(False)
+            return
+        if(delta.x != 0):
+            direcc = pygame.math.Vector2(delta.x/abs(delta.x),
+                                         delta.y/abs(delta.x))
+        else:
+            direcc = pygame.math.Vector2(0, delta.y/abs(delta.y))
+        v_intercambio = V_INTERCAMBIO * direcc
+        # Obtengo t_intercambio
+        t_intercambio = 2 * delta.magnitude() / v_intercambio.magnitude()
+        # Obtengo aceleracion
+        a_intercambio = (-v_intercambio) / t_intercambio
+        # Obtengo posicion
+        p = self.p1 + v_intercambio * t + a_intercambio * 0.5 * t**2
+        if(t == int(t_intercambio)):
+            self.setIntercambio(False)
+        self.rect.centerx = p.x
+        self.rect.centery = p.y
