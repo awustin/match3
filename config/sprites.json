@@ -1,0 +1,37 @@
+{
+    "default": {
+        "path": "data\\sprites\\ficha5.png",
+        "num_frames": 1,
+        "width_px": 40,
+        "height_px": 40,
+        "anim_speed": 0
+    },
+    "1": {
+        "path": "data\\sprites\\spr_mushroom1.png",
+        "num_frames": 32,
+        "width_px": 60,
+        "height_px": 60,
+        "anim_speed": 0.4
+    },
+    "2": {
+        "path": "data\\sprites\\spr_mushroom2.png",
+        "num_frames": 32,
+        "width_px": 60,
+        "height_px": 60,
+        "anim_speed": 0.2
+    },
+    "3": {
+        "path": "data\\sprites\\ficha3.png",
+        "num_frames": 1,
+        "width_px": 40,
+        "height_px": 40,
+        "anim_speed": 0
+    },
+    "4": {
+        "path": "data\\sprites\\ficha4.png",
+        "num_frames": 1,
+        "width_px": 40,
+        "height_px": 40,
+        "anim_speed": 0
+    }
+}

@@ -1,26 +1,44 @@
 # Clase ficha:
-# Agrupa el tipo de ficha.
 # Agrupa los estados de una ficha:
 # Ninguno, alineada, seleccionada
-# Además su animación: gravedad
+# Además su animación: gravedad y sprite
 import pygame
-from tipoficha import TipoFicha
+import spritesData
 
-GRAVEDAD = 2
-V_INTERCAMBIO = 6
+GRAVEDAD = 1.2
+V_INTERCAMBIO = 7
 
 
 class Ficha(pygame.sprite.Sprite):
-    def __init__(self, idTipo=0, x=0, y=0):
+    __frames = []
+    __num_frames = 0
+    __current_frame = 0
+    __current_step = 0
+    __anim_speed = 0
+
+    def __init__(self, token_class=0):
         pygame.sprite.Sprite.__init__(self)
-        self.__seleccionada = False
-        self.__cae = False
-        self.__intercambia = False
-        self.__tipo = TipoFicha(idTipo)
-        self.image = self.__tipo.getImage()
+        self.__class = token_class
+        print(f'\n**La ficha es de la clase {token_class}')
+        self.__load_sprite()
+        self.__init_physics()
+        self.set_seleccionada(False)
+#  //
+#  Inicialización
+#  //
+
+    def __load_sprite(self):
+        if self.__class == 0:
+            self.__class = 'default'
+        self.__frames = spritesData.get_animation_frames(key=self.__class)
+        self.__num_frames = spritesData.get_num_frames(key=self.__class)
+        self.__anim_speed = spritesData.get_anim_speed(key=self.__class)
+        self.image = self.__frames[0]
         self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        self.rect.x = 0
+        self.rect.y = 0
+
+    def __init_physics(self):
         self.t = 0
         self.v_inicial = 0
         self.y_inicial = self.rect.centery
@@ -32,18 +50,10 @@ class Ficha(pygame.sprite.Sprite):
 #  Métodos get-set
 #  //
 
-    def getTipo(self):
-        return self.__tipo
-
-    def getTipoInt(self):
+    def get_class(self):
         '''Devuelve el numero entero que identifica\n
-        al tipo de ficha'''
-        return self.__tipo.getId()
-
-    def setTipo(self, tipo):
-        '''Asigna el tipo\n
-        y setea el color correspondiente'''
-        self.__tipo = tipo
+        a la clase de la ficha'''
+        return self.__class
 
     def setVelocidadInicial(self, velocidad):
         '''En pixeles por frame'''
@@ -83,11 +93,10 @@ class Ficha(pygame.sprite.Sprite):
 # //
 # Métodos para manipular el estado de la ficha
 # //
-
     def estaSeleccionada(self):
         return self.__seleccionada
 
-    def setSeleccionada(self, valor):
+    def set_seleccionada(self, valor):
         '''Si valor es True, pone en True la bandera
         de "seleccionada" y las demás banderas en False.\n
         Si valor es False, pone todas en False'''
@@ -132,18 +141,20 @@ class Ficha(pygame.sprite.Sprite):
             self.__cae = False
             self.__intercambia = False
 
-    def equals(self, otraFicha):
-        return self.__tipo.getId() == otraFicha.getTipoInt()
+    def equals(self, other):
+        return self.__class == other.get_class()
 
     def update(self, ventana):
-        '''Caida: hasta una posición final'''
         if(self.estaCayendo() and self.rect.centery < self.y_final):
+            '''Caida: hasta una posición final'''
             self.grav(self.t)
             self.t += 1
         elif(self.estaSeleccionada()):
+            '''Seleccionada'''
             pass
             # Animacion de seleccionada
         elif(self.estaIntercambiando()):
+            '''Intercambio: se mueve hacia otra celda'''
             if(self.t == 0):
                 self.p1 = pygame.math.Vector2(
                           *self.__celdaOrigen.getPosicionCentro())
@@ -158,6 +169,7 @@ class Ficha(pygame.sprite.Sprite):
             self.__cae = False
             self.__intercambia = False
             self.__seleccionada = False
+        self.nextFrame()
         ventana.blit(self.image, self.rect)
 
     def grav(self, t):
@@ -165,7 +177,7 @@ class Ficha(pygame.sprite.Sprite):
         self.rect.centery = y
 
     def movCuadratico(self, t):
-        # Obtengo direccion y modulo de v_intercambio
+        '''Obtengo direccion y modulo de v_intercambio'''
         delta = self.p2 - self.p1
         if(delta == (0, 0)):
             self.setIntercambio(False)
@@ -186,3 +198,13 @@ class Ficha(pygame.sprite.Sprite):
             self.setIntercambio(False)
         self.rect.centerx = p.x
         self.rect.centery = p.y
+
+    def nextFrame(self):
+        '''Avanza en el spritesheet'''
+        self.__current_step = self.__current_step + self.__anim_speed
+        pointer = int(self.__current_step)
+        if(pointer == self.__num_frames):
+            self.__current_step = 0
+            pointer = 0
+        self.__current_frame = pointer
+        self.image = self.__frames[self.__current_frame]

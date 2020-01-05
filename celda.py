@@ -38,13 +38,13 @@ class Celda(object):
 # Metodos sobre las fichas
 # //
 
-    def setFicha(self, idTipo=0, ficha=None):
+    def setFicha(self, token_class=0, ficha=None):
         '''Instancia y/o asigna una ficha a la celda.\n
-        "tipo" es el id entero del Tipo.\n
-        Si no se pasa un tipo, se asigna\n
+        "token_class" es la clase de la ficha.\n
+        Si no se pasa una clase, se asigna\n
         NO_ESPECIFICADO'''
         if(ficha is None):
-            ficha = Ficha(idTipo)
+            ficha = Ficha(token_class)
             self.__ficha = ficha
         else:
             self.__ficha = ficha
@@ -54,12 +54,12 @@ class Celda(object):
     def seleccionarFicha(self):
         '''Marca la ficha correspondiente a\n
         esta celda como "seleccionada"'''
-        self.__ficha.setSeleccionada(True)
+        self.__ficha.set_seleccionada(True)
 
     def deseleccionarFicha(self):
         '''Pone en False la bandera\n
         "seleccionada" de la ficha'''
-        self.__ficha.setSeleccionada(False)
+        self.__ficha.set_seleccionada(False)
 
     def getFicha(self):
         return self.__ficha

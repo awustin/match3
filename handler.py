@@ -33,8 +33,8 @@ class Handler(object):
                 fichas.append([])
                 for col in range(len(enteros[row])):
                     if(enteros[row][col] != -1):
-                        idTipo = enteros[row][col]
-                        ficha = Ficha(idTipo=idTipo)
+                        token_class = enteros[row][col]
+                        ficha = Ficha(token_class=token_class)
                     else:
                         ficha = None
                     fichas[row].append(ficha)
@@ -58,8 +58,8 @@ class Handler(object):
                             ficha = fichasAnterior[row][col]
                         else:
                             '''La ficha se crea en el lugar de una eliminada'''
-                            tipoNuevo = enteros[row][col]
-                            ficha = Ficha(tipoNuevo)
+                            new_class = enteros[row][col]
+                            ficha = Ficha(token_class=new_class)
                     else:
                         '''Había una ficha no nula'''
                         if(enteros[row][col] == -1):
@@ -67,14 +67,14 @@ class Handler(object):
                             ficha = None
                         else:
                             '''La ficha no se elimina'''
-                            tipoAnterior = fichasAnterior[row][col].getTipoInt()
-                            if(tipoAnterior == enteros[row][col]):
+                            prev_token_class = fichasAnterior[row][col].get_class()
+                            if(prev_token_class == enteros[row][col]):
                                 '''La ficha coincide con el entero que trae'''
                                 ficha = fichasAnterior[row][col]
                             else:
                                 '''La ficha no coincide con el entero que trae'''
-                                tipoNuevo = enteros[row][col]
-                                ficha = Ficha(tipoNuevo)
+                                new_class = enteros[row][col]
+                                ficha = Ficha(new_class)
                     fichasNuevas[row].append(ficha)
             self.__fichas = fichasNuevas
             return self.__fichas
@@ -123,7 +123,7 @@ class Handler(object):
         for col in range(len(filaNueva)):
             ficha = None
             if(filaNueva[col] != -1):
-                ficha = Ficha(idTipo=filaNueva[col])
+                ficha = Ficha(token_class=filaNueva[col])
             fichasNuevas.append(ficha)
         return fichasNuevas
             

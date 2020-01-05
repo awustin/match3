@@ -1,5 +1,6 @@
 # Tablero
 # Celdas de 50x50 (8x8 celdas)
+import sys
 import pygame
 from pygame import draw
 from pygame import time
@@ -7,8 +8,13 @@ from pygame import sprite
 from handler import Handler
 from celda import Celda
 from random import random
-import globales
 
+sys.path.insert(0, 'config')
+try:
+    import globales
+except Exception as e:
+    print(e)
+    raise
 
 X_CUAD = 480
 Y_CUAD = X_CUAD
@@ -102,10 +108,8 @@ class Tablero:
         for row in reversed(range(len(fichas))):
             for col in range(len(fichas)):
                 celda = self.__celdas[row][col]
-                centro = celda.getPosicionCentro()
-                fichas[row][col].setPosicionCentro(*centro)
                 celda.setFicha(ficha=fichas[row][col])
-                time.wait(7)
+                time.wait(5)
                 fichas[row][col].update(ventana)
                 pygame.display.update()
                 if(row == len(self.__celdas)-1
@@ -167,8 +171,8 @@ class Tablero:
             for col in range(len(self.__celdas[row])):
                 if(self.__celdas[row][col].hayFicha()):
                     ficha = self.__celdas[row][col].getFicha()
-                    tipo = ficha.getTipoInt()
-                    enteros[row].append(tipo)
+                    token_class = ficha.get_class()
+                    enteros[row].append(token_class)
                 else:
                     enteros[row].append(-1)
         self.handler.enviarConfiguracionTablero(enteros)
@@ -426,7 +430,6 @@ class Tablero:
                     dentroCuadricula = True
                     estadoFicha = self.handler.seleccionFichasYEstado(row, col)
                     selector.setPos(row, col)
-                    print(estadoFicha)
                     if(estadoFicha['seleccionada']):
                         celda.seleccionarFicha()
                     else:
@@ -446,3 +449,11 @@ class Tablero:
             print("Fuera del tablero")
         if(limpiar):
             self.limpiarSeleccionCeldas()
+
+    def posicionarSelector(self, x, y, selector):
+        for row in range(len(self.__celdas)):
+            for col in range(len(self.__celdas[row])):
+                celda = self.__celdas[row][col]
+                if(celda.getRect().collidepoint(x, y)):
+                    selector.setPos(row, col)
+                    return

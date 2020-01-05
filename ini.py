@@ -6,13 +6,20 @@ from pygame import time
 from pygame import mouse
 from pygame import event
 from pygame import sprite
-import globales
 import customEnums
 from pantalla import Pantalla
 from texto import Texto
 from tablero import Tablero
 from selector import Selector
 from ficha import Ficha
+import spritesData as sprites
+
+sys.path.insert(0, 'config')
+try:
+    import globales
+except Exception as e:
+    print(e)
+    raise
 
 
 class App:
@@ -30,6 +37,7 @@ class App:
         self.mjeInicio.setPosicion(posX, posY)
         self.tablero = Tablero(color=(20, 40, 80))
         self.selector = Selector(self.tablero)
+        sprites.init_sprite_data()
 
     def ejecutar(self):
         clock = time.Clock()
@@ -73,13 +81,15 @@ class App:
                 if(evento.type == pygame.MOUSEBUTTONDOWN):
                     if(mouse.get_pressed()[0] == 1):
                         self.tablero.clickXY(*mouse.get_pos(), self.selector,
-                                             self.pantalla.getDisplay(), colorPpal)
+                                             self.pantalla.getDisplay(),
+                                             colorPpal)
             self.pantalla.colorFondo(colorPpal)
             hayAlineaciones = self.tablero.actualizarTableroConEstado(
                                           self.pantalla.getDisplay())
             if(hayAlineaciones):
                 self.tablero.alineacionEnTablero(self.pantalla.getDisplay(),
                                                  colorPpal)
+            self.tablero.posicionarSelector(*mouse.get_pos(), self.selector)
             self.selector.update(self.pantalla.getDisplay())
             pygame.display.update()
 
@@ -90,7 +100,7 @@ class App:
         fichas = []
         grupo_fichas = sprite.Group()
         for i in range(1, 5):
-            ficha = Ficha(idTipo=i, x=60*(i-1))
+            ficha = Ficha(token_class=i, x=60*(i-1))
             fichas.append(ficha)
         for ficha in fichas:
             grupo_fichas.add(ficha)

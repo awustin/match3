@@ -1,6 +1,6 @@
 import os
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.abspath(os.path.curdir)
 
 LOGO = os.path.join(ROOT_DIR, 'data\\images\\logoJelly.png')
 CAPTION = "Juego"
