@@ -8,30 +8,30 @@
     },
     "1": {
         "path": "data\\sprites\\spr_mushroom1.png",
-        "num_frames": 32,
+        "num_frames": 33,
         "width_px": 60,
         "height_px": 60,
         "anim_speed": 0.4
     },
     "2": {
         "path": "data\\sprites\\spr_mushroom2.png",
-        "num_frames": 32,
+        "num_frames": 33,
         "width_px": 60,
         "height_px": 60,
-        "anim_speed": 0.2
+        "anim_speed": 0.35
     },
     "3": {
-        "path": "data\\sprites\\ficha3.png",
-        "num_frames": 1,
-        "width_px": 40,
-        "height_px": 40,
-        "anim_speed": 0
+        "path": "data\\sprites\\spr_mushroom3.png",
+        "num_frames": 50,
+        "width_px": 60,
+        "height_px": 60,
+        "anim_speed": 0.4
     },
     "4": {
-        "path": "data\\sprites\\ficha4.png",
-        "num_frames": 1,
-        "width_px": 40,
-        "height_px": 40,
-        "anim_speed": 0
+        "path": "data\\sprites\\spr_mushroom4.png",
+        "num_frames": 50,
+        "width_px": 60,
+        "height_px": 60,
+        "anim_speed": 0.4
     }
 }

@@ -19,7 +19,6 @@ class Ficha(pygame.sprite.Sprite):
     def __init__(self, token_class=0):
         pygame.sprite.Sprite.__init__(self)
         self.__class = token_class
-        print(f'\n**La ficha es de la clase {token_class}')
         self.__load_sprite()
         self.__init_physics()
         self.set_seleccionada(False)
