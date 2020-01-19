@@ -11,7 +11,8 @@ from pantalla import Pantalla
 from texto import Texto
 from tablero import Tablero
 from selector import Selector
-from ficha import Ficha
+from ficha import UnbreakableBlock
+from ficha import Chip
 import spritesData as sprites
 
 sys.path.insert(0, 'config')
@@ -97,15 +98,18 @@ class App:
         gameOver = False
         colorPpal = (100, 100, 100)
         print("Test...")
-        fichas = []
-        grupo_fichas = sprite.Group()
-        for i in range(1, 5):
-            ficha = Ficha(token_class=i, x=60*(i-1))
-            fichas.append(ficha)
-        for ficha in fichas:
-            grupo_fichas.add(ficha)
-        fichas[3].setIntercambio(True)
-        grupo_fichas.draw(self.pantalla.getDisplay())
+        items = []
+        item_group = sprite.Group()
+        for i in range(5):
+            if i == 0:
+                item = UnbreakableBlock()
+            else:
+                item = Chip(cell_class=i)
+            item.setPosicionCentro(i*70 + 40, 60)
+            items.append(item)
+        for item in items:
+            item_group.add(item)
+        item_group.draw(self.pantalla.getDisplay())
         while(not gameOver):
             for evento in event.get():
                 if(evento.type == pygame.QUIT):
@@ -117,7 +121,7 @@ class App:
                     if(evento.key == pygame.K_a):
                         return
             self.pantalla.colorFondo(colorPpal)
-            grupo_fichas.update(self.pantalla.getDisplay())
+            item_group.update(self.pantalla.getDisplay())
             pygame.display.update()
 
 

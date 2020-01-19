@@ -1,6 +1,6 @@
 # Celda
 from pygame import Rect
-from ficha import Ficha
+from ficha import Chip
 
 
 class Celda(object):

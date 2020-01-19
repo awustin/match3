@@ -5,30 +5,40 @@
 import pygame
 import spritesData
 
-GRAVEDAD = 1.2
+GRAVITY = 1.2
 V_INTERCAMBIO = 7
 
 
-class Ficha(pygame.sprite.Sprite):
-    __frames = []
-    __num_frames = 0
-    __current_frame = 0
-    __current_step = 0
-    __anim_speed = 0
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# ---- CellContent Class ------------------------------------------ #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-    def __init__(self, token_class=0):
+class CellContent(pygame.sprite.Sprite):
+    def __init__(self, cell_class):
         pygame.sprite.Sprite.__init__(self)
-        self.__class = token_class
-        self.__load_sprite()
-        self.__init_physics()
-        self.set_seleccionada(False)
-#  //
-#  Inicialización
-#  //
+        self._load_cell_class(cell_class)
+        self._init_animation_parameters()
+        self._load_sprite()
+        self._init_physics()
 
-    def __load_sprite(self):
-        if self.__class == 0:
+#  //
+#  Initialization
+#  //
+    def _load_cell_class(self, cell_class):
+        if cell_class == 0:
             self.__class = 'default'
+        else:
+            self.__class = cell_class
+        return
+
+    def _init_animation_parameters(self):
+        self.__frames = []
+        self.__num_frames = 0
+        self.__current_frame = 0
+        self.__current_step = 0
+        self.__anim_speed = 0
+
+    def _load_sprite(self):
         self.__frames = spritesData.get_animation_frames(key=self.__class)
         self.__num_frames = spritesData.get_num_frames(key=self.__class)
         self.__anim_speed = spritesData.get_anim_speed(key=self.__class)
@@ -37,21 +47,18 @@ class Ficha(pygame.sprite.Sprite):
         self.rect.x = 0
         self.rect.y = 0
 
-    def __init_physics(self):
+    def _init_physics(self):
         self.t = 0
-        self.v_inicial = 0
-        self.y_inicial = self.rect.centery
-        self.y_final = self.y_inicial + 100
-        self.__celdaDestino = None
-        self.__celdaOrigen = None
+        self.v_initial = 0
+        self.y_initial = self.rect.centery
+        self.y_final = self.y_initial + 100
+        self._origin_cell = None
+        self._target_cell = None
 
 #  //
-#  Métodos get-set
+#  Get - Set Methods
 #  //
-
     def get_class(self):
-        '''Devuelve el numero entero que identifica\n
-        a la clase de la ficha'''
         return self.__class
 
     def setVelocidadInicial(self, velocidad):
@@ -89,8 +96,47 @@ class Ficha(pygame.sprite.Sprite):
     def getCeldaOrigen(self):
         return self.__celdaOrigen
 
+#  //
+#  Status methods
+#  //
+    def estaCayendo(self):
+        return self._cae
+
+    def setCae(self, value):
+        self.__falling = value
+
+    def equals(self, other):
+        return self.__class == other.get_class()
+
+#  //
+#  Update method
+#  //
+
+    def __nextFrame(self):
+        '''Avanza en el spritesheet'''
+        self.__current_step = self.__current_step + self.__anim_speed
+        pointer = int(self.__current_step)
+        if(pointer == self.__num_frames):
+            self.__current_step = 0
+            pointer = 0
+        self.__current_frame = pointer
+        self.image = self.__frames[self.__current_frame]
+
+    def update(self):
+        self.__nextFrame()
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# ---- Chip Class ------------------------------------------------- #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+class Chip(CellContent):
+    def __init__(self, cell_class=0):
+        super().__init__(cell_class)
+        self.set_seleccionada(False)
+
 # //
-# Métodos para manipular el estado de la ficha
+# Status methods
 # //
     def estaSeleccionada(self):
         return self.__seleccionada
@@ -101,15 +147,12 @@ class Ficha(pygame.sprite.Sprite):
         Si valor es False, pone todas en False'''
         if(valor):
             self.__seleccionada = valor
-            self.__cae = False
+            self._cae = False
             self.__intercambia = False
         else:
             self.__seleccionada = False
-            self.__cae = False
+            self._cae = False
             self.__intercambia = False
-
-    def estaCayendo(self):
-        return self.__cae
 
     def setCae(self, valor):
         '''Si valor es True, pone en True la bandera
@@ -117,11 +160,11 @@ class Ficha(pygame.sprite.Sprite):
         Si valor es False, pone todas en False'''
         if(valor):
             self.__seleccionada = False
-            self.__cae = valor
+            self._cae = valor
             self.__intercambia = False
         else:
             self.__seleccionada = False
-            self.__cae = False
+            self._cae = False
             self.__intercambia = False
 
     def estaIntercambiando(self):
@@ -133,15 +176,12 @@ class Ficha(pygame.sprite.Sprite):
         Si valor es False, pone todas en False'''
         if(valor):
             self.__seleccionada = False
-            self.__cae = False
+            self._cae = False
             self.__intercambia = valor
         else:
             self.__seleccionada = False
-            self.__cae = False
+            self._cae = False
             self.__intercambia = False
-
-    def equals(self, other):
-        return self.__class == other.get_class()
 
     def update(self, ventana):
         if(self.estaCayendo() and self.rect.centery < self.y_final):
@@ -165,14 +205,14 @@ class Ficha(pygame.sprite.Sprite):
             self.t = 0
             self.v_inicial = 0
             self.y_inicial = self.rect.centery
-            self.__cae = False
+            self._cae = False
             self.__intercambia = False
             self.__seleccionada = False
-        self.nextFrame()
+        super().update()
         ventana.blit(self.image, self.rect)
 
     def grav(self, t):
-        y = self.y_inicial + self.v_inicial*t + 0.5*GRAVEDAD*t
+        y = self.y_inicial + self.v_inicial*t + 0.5*GRAVITY*t
         self.rect.centery = y
 
     def movCuadratico(self, t):
@@ -198,12 +238,65 @@ class Ficha(pygame.sprite.Sprite):
         self.rect.centerx = p.x
         self.rect.centery = p.y
 
-    def nextFrame(self):
-        '''Avanza en el spritesheet'''
-        self.__current_step = self.__current_step + self.__anim_speed
-        pointer = int(self.__current_step)
-        if(pointer == self.__num_frames):
-            self.__current_step = 0
-            pointer = 0
-        self.__current_frame = pointer
-        self.image = self.__frames[self.__current_frame]
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# ---- UnbreakableBlock Class ------------------------------------- #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+class UnbreakableBlock(CellContent):
+
+    def __init__(self):
+        super().__init__(cell_class=-2)
+        self.__falling = False
+
+#  //
+#  Position
+#  //
+
+    def setCeldaOrigen(self, cell):
+        self.__origin_cell = cell
+
+    def getCeldaOrigen(self):
+        return self.__origin_cell
+
+    def setCeldaDestino(self, cell):
+        self.__target_cell = cell
+
+    def getCeldaDestino(self):
+        return self.__target_cell
+
+    def setPosicionCentro(self, x, y):
+        self.rect.centerx = x
+        self.rect.centery = y
+
+    def getPosicionCentro(self):
+        return self.rect.center
+
+    def setPosicionFinalCaida(self, y_final):
+        if(not self.is_falling()):
+            self.y_final = y_final
+
+    def setVelocidadInicial(self, speed):
+        if(not self.is_falling()):
+            int(speed)
+            self.v_initial = speed
+
+#  //
+#  Update
+#  //
+    def __gravity(self, t):
+        y = self.y_initial + self.v_initial*t + 0.5*GRAVITY*t
+        self.rect.centery = y
+
+    def update(self, display):
+        if(self.__falling and self.rect.centery < self.y_final):
+            '''Falling: to a final position'''
+            self.__gravity(self.t)
+            self.t += 1
+        else:
+            self.t = 0
+            self.v_initial = 0
+            self.y_initial = self.rect.centery
+            self.__falling = False
+        super().update()
+        display.blit(self.image, self.rect)
