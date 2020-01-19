@@ -90,4 +90,3 @@ class SpriteData(object):
 
     def get_path(self):
         return self.__path
-

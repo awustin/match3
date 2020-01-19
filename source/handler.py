@@ -10,7 +10,7 @@ class Handler(object):
         print("Handler")
         self.__fichas = []
         self.__calculador = Calculador(tamanio)
-        
+
     def requestFichasRan(self, n):
         ''' Arma matriz de fichas aleatorias y devuelve dicha matriz.
         n es la dimension de la matriz cuadrada'''
@@ -71,12 +71,14 @@ class Handler(object):
                             ficha = None
                         else:
                             '''La ficha no se elimina'''
-                            prev_token_class = fichasAnterior[row][col].get_class()
+                            prev_token_class = fichasAnterior[row][col] \
+                                .get_class()
                             if(prev_token_class == enteros[row][col]):
                                 '''La ficha coincide con el entero que trae'''
                                 ficha = fichasAnterior[row][col]
                             else:
-                                '''La ficha no coincide con el entero que trae'''
+                                '''La ficha no coincide con el entero que
+                                trae'''
                                 new_class = enteros[row][col]
                                 ficha = Chip(cell_class=new_class)
                     fichasNuevas[row].append(ficha)

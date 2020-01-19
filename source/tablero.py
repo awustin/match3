@@ -204,8 +204,10 @@ class Tablero:
                         celdaOrigen.get_cell_content().setVelocidadInicial(
                                                VELOCIDAD_CAIDA)
                         celdaOrigen.get_cell_content().setCae(True)
-                        celdaOrigen.get_cell_content().set_origin_cell(celdaOrigen)
-                        celdaOrigen.get_cell_content().set_target_cell(celdaDestino)
+                        celdaOrigen.get_cell_content() \
+                            .set_origin_cell(celdaOrigen)
+                        celdaOrigen.get_cell_content() \
+                            .set_target_cell(celdaDestino)
                         self.__estanCayendo = True
         self.actualizarTableroCaenFichas(ventana, colorFondo)
         self.asignarANuevasCeldas(columnas)
@@ -429,7 +431,8 @@ class Tablero:
                 celda = self.__celdas[row][col]
                 if(celda.esClickeada(x, y) and celda.hayFicha()):
                     dentroCuadricula = True
-                    token_class = self.__celdas[row][col].get_cell_content().get_class()
+                    token_class = self.__celdas[row][col].get_cell_content() \
+                        .get_class()
                     if(token_class in NOT_CLICKABLE):
                         break
                     estadoFicha = self.handler.seleccionFichasYEstado(row, col)
