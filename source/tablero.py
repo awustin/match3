@@ -154,14 +154,14 @@ class Tablero:
         les es asignada su celda destino'''
         for col in columnas:
             for row in reversed(range(N_CELDAS)):
-                ficha = self.__celdas[row][col].getFicha()
+                ficha = self.__celdas[row][col].get_cell_content()
                 if(ficha is not None):
                     celdaDestino = ficha.getCeldaDestino()
                     if(celdaDestino is not None):
                         celdaOrigen = ficha.getCeldaOrigen()
                         celdaOrigen.pasarFicha(celdaDestino)
-                        ficha.setCeldaDestino(None)
-                        ficha.setCeldaOrigen(celdaDestino)
+                        ficha.set_target_cell(None)
+                        ficha.set_origin_cell(celdaDestino)
 
     def enviarActualizacionAlineaciones(self):
         '''Tras un pasaje de fichas por un alineacion,
@@ -171,7 +171,7 @@ class Tablero:
             enteros.append([])
             for col in range(len(self.__celdas[row])):
                 if(self.__celdas[row][col].hayFicha()):
-                    ficha = self.__celdas[row][col].getFicha()
+                    ficha = self.__celdas[row][col].get_cell_content()
                     token_class = ficha.get_class()
                     enteros[row].append(token_class)
                 else:
@@ -198,14 +198,14 @@ class Tablero:
                         j += 1
                     if(agujerosDebajo != 0):
                         celdaDestino = self.__celdas[row + agujerosDebajo][col]
-                        celdaOrigen.getFicha().setPosicionFinalCaida(
+                        celdaOrigen.get_cell_content().setPosicionFinalCaida(
                                               celdaDestino.
                                               getPosicionCentro()[1])
-                        celdaOrigen.getFicha().setVelocidadInicial(
+                        celdaOrigen.get_cell_content().setVelocidadInicial(
                                                VELOCIDAD_CAIDA)
-                        celdaOrigen.getFicha().setCae(True)
-                        celdaOrigen.getFicha().setCeldaOrigen(celdaOrigen)
-                        celdaOrigen.getFicha().setCeldaDestino(celdaDestino)
+                        celdaOrigen.get_cell_content().setCae(True)
+                        celdaOrigen.get_cell_content().set_origin_cell(celdaOrigen)
+                        celdaOrigen.get_cell_content().set_target_cell(celdaDestino)
                         self.__estanCayendo = True
         self.actualizarTableroCaenFichas(ventana, colorFondo)
         self.asignarANuevasCeldas(columnas)
@@ -221,7 +221,7 @@ class Tablero:
             for item in alineacion:
                 row = item[0]
                 col = item[1]
-                ficha = self.__celdas[row][col].getFicha()
+                ficha = self.__celdas[row][col].get_cell_content()
                 ficha.kill()
                 self.__celdas[row][col].borrarFicha()
                 columnasConAgujeros.add(col)
@@ -230,7 +230,7 @@ class Tablero:
                 row = item[0]
                 col = item[1]
                 if(self.__celdas[row][col].hayFicha()):
-                    ficha = self.__celdas[row][col].getFicha()
+                    ficha = self.__celdas[row][col].get_cell_content()
                     ficha.kill()
                     self.__celdas[row][col].borrarFicha()
                 columnasConAgujeros.add(col)
@@ -278,7 +278,7 @@ class Tablero:
                         ficha = nuevaFila[col]
                         celdaDestino = self.__celdas[row][col]
                         ficha.setPosicionCentro(*posicionAparecen)
-                        ficha.setCeldaDestino(celdaDestino)
+                        ficha.set_target_cell(celdaDestino)
                         ficha.setPosicionFinalCaida(
                               celdaDestino.getPosicionCentro()[1])
                         ficha.setVelocidadInicial(VELOCIDAD_RELLENO)
@@ -291,8 +291,8 @@ class Tablero:
                     if(ficha is not None):
                         celdaDestino = ficha.getCeldaDestino()
                         celdaDestino.setFicha(ficha=ficha)
-                        ficha.setCeldaDestino(None)
-                        ficha.setCeldaOrigen(celdaDestino)
+                        ficha.set_target_cell(None)
+                        ficha.set_origin_cell(celdaDestino)
         self.enviarActualizacionAlineaciones()
 
     def alineacionEnTablero(self, ventana, colorFondo):
@@ -319,7 +319,7 @@ class Tablero:
                 celda = celdas[row][col]
                 if(celda.hayFicha()):
                     '''La ficha existe'''
-                    self.agregarFichasAGrupo(celda.getFicha())
+                    self.agregarFichasAGrupo(celda.get_cell_content())
                 else:
                     '''La ficha se eliminó'''
                     self.__celdas[row][col].borrarFicha()
@@ -394,14 +394,14 @@ class Tablero:
         celda2 = self.__celdas[x2][y2]
         fichasSwapping = []
         # Asignar ficha origen y destino: Ficha 1
-        ficha1 = celda1.getFicha()
-        ficha1.setCeldaOrigen(celda1)
-        ficha1.setCeldaDestino(celda2)
+        ficha1 = celda1.get_cell_content()
+        ficha1.set_origin_cell(celda1)
+        ficha1.set_target_cell(celda2)
         ficha1.setIntercambio(True)
         # Asignar ficha origen y destino: Ficha 2
-        ficha2 = celda2.getFicha()
-        ficha2.setCeldaOrigen(celda2)
-        ficha2.setCeldaDestino(celda1)
+        ficha2 = celda2.get_cell_content()
+        ficha2.set_origin_cell(celda2)
+        ficha2.set_target_cell(celda1)
         ficha2.setIntercambio(True)
         self.__estanSwapping = True
         fichasSwapping.append(ficha1)
@@ -409,10 +409,10 @@ class Tablero:
         # Actualizar durante animacion
         self.actualizarTableroSwapping(ventana, colorFondo, fichasSwapping)
         # Setear celdaOrigen
-        ficha1.setCeldaOrigen(celda2)
-        ficha2.setCeldaOrigen(celda1)
-        ficha1.setCeldaDestino(None)
-        ficha2.setCeldaDestino(None)
+        ficha1.set_origin_cell(celda2)
+        ficha2.set_origin_cell(celda1)
+        ficha1.set_target_cell(None)
+        ficha2.set_target_cell(None)
         celda1.setFicha(ficha=ficha2)
         celda2.setFicha(ficha=ficha1)
 
@@ -429,7 +429,7 @@ class Tablero:
                 celda = self.__celdas[row][col]
                 if(celda.esClickeada(x, y) and celda.hayFicha()):
                     dentroCuadricula = True
-                    token_class = self.__celdas[row][col].getFicha().get_class()
+                    token_class = self.__celdas[row][col].get_cell_content().get_class()
                     if(token_class in NOT_CLICKABLE):
                         break
                     estadoFicha = self.handler.seleccionFichasYEstado(row, col)

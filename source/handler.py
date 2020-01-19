@@ -36,10 +36,9 @@ class Handler(object):
                 for col in range(len(enteros[row])):
                     item = enteros[row][col]
                     if(item != -1 and item != -2):
-                        token_class = enteros[row][col]
-                        ficha = Ficha(token_class=token_class)
+                        ficha = Chip(cell_class=enteros[row][col])
                     elif(item == -2):
-                        ficha = Unbreakable()
+                        ficha = UnbreakableBlock()
                     else:
                         ficha = None
                     fichas[row].append(ficha)
@@ -64,7 +63,7 @@ class Handler(object):
                         else:
                             '''La ficha se crea en el lugar de una eliminada'''
                             new_class = enteros[row][col]
-                            ficha = Ficha(token_class=new_class)
+                            ficha = Chip(cell_class=new_class)
                     else:
                         '''Había una ficha no nula'''
                         if(enteros[row][col] == -1):
@@ -79,7 +78,7 @@ class Handler(object):
                             else:
                                 '''La ficha no coincide con el entero que trae'''
                                 new_class = enteros[row][col]
-                                ficha = Ficha(new_class)
+                                ficha = Chip(cell_class=new_class)
                     fichasNuevas[row].append(ficha)
             self.__fichas = fichasNuevas
             return self.__fichas
@@ -128,9 +127,6 @@ class Handler(object):
         for col in range(len(filaNueva)):
             ficha = None
             if(filaNueva[col] != -1):
-                ficha = Ficha(token_class=filaNueva[col])
+                ficha = Chip(cell_class=filaNueva[col])
             fichasNuevas.append(ficha)
         return fichasNuevas
-            
-
-

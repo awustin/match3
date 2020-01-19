@@ -38,13 +38,13 @@ class Celda(object):
 # Metodos sobre las fichas
 # //
 
-    def setFicha(self, token_class=0, ficha=None):
+    def setFicha(self, cell_class=0, ficha=None):
         '''Instancia y/o asigna una ficha a la celda.\n
         "token_class" es la clase de la ficha.\n
         Si no se pasa una clase, se asigna\n
         NO_ESPECIFICADO'''
         if(ficha is None):
-            ficha = Ficha(token_class)
+            ficha = Chip(cell_class)
             self.__ficha = ficha
         else:
             self.__ficha = ficha
@@ -63,7 +63,7 @@ class Celda(object):
         if(self.__ficha.get_class() != -2):
             self.__ficha.set_seleccionada(False)
 
-    def getFicha(self):
+    def get_cell_content(self):
         return self.__ficha
 
     def hayFicha(self):
@@ -104,7 +104,7 @@ class Celda(object):
             raise Exception(
                   f'La celda {self.getCoord()} no tiene ninguna ficha')
         else:
-            ficha = self.getFicha()
+            ficha = self.get_cell_content()
             celda.setFicha(ficha=ficha)
             self.__ficha = None
 

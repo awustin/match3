@@ -48,6 +48,7 @@ class CellContent(pygame.sprite.Sprite):
         self.rect.y = 0
 
     def _init_physics(self):
+        self._cae = False
         self.t = 0
         self.v_initial = 0
         self.y_initial = self.rect.centery
@@ -68,7 +69,7 @@ class CellContent(pygame.sprite.Sprite):
                   'No se puede cambiar la velocidad inicial')
         else:
             int(velocidad)
-            self.v_inicial = velocidad
+            self.v_initial = velocidad
 
     def setPosicionFinalCaida(self, y_final):
         if(self.estaCayendo()):
@@ -84,21 +85,24 @@ class CellContent(pygame.sprite.Sprite):
     def getPosicionCentro(self):
         return self.rect.center
 
-    def setCeldaDestino(self, celda):
-        self.__celdaDestino = celda
+    def set_target_cell(self, celda):
+        self._target_cell = celda
 
     def getCeldaDestino(self):
-        return self.__celdaDestino
+        return self._target_cell
 
-    def setCeldaOrigen(self, celda):
-        self.__celdaOrigen = celda
+    def set_origin_cell(self, celda):
+        self._origin_cell = celda
 
     def getCeldaOrigen(self):
-        return self.__celdaOrigen
+        return self._origin_cell
 
 #  //
 #  Status methods
 #  //
+    def is_falling(self):
+        return self._cae
+
     def estaCayendo(self):
         return self._cae
 
@@ -196,15 +200,15 @@ class Chip(CellContent):
             '''Intercambio: se mueve hacia otra celda'''
             if(self.t == 0):
                 self.p1 = pygame.math.Vector2(
-                          *self.__celdaOrigen.getPosicionCentro())
+                          *self._origin_cell.getPosicionCentro())
                 self.p2 = pygame.math.Vector2(
-                          *self.__celdaDestino.getPosicionCentro())
+                          *self._target_cell.getPosicionCentro())
             self.movCuadratico(self.t)
             self.t += 1
         else:
             self.t = 0
-            self.v_inicial = 0
-            self.y_inicial = self.rect.centery
+            self.v_initial = 0
+            self.y_initial = self.rect.centery
             self._cae = False
             self.__intercambia = False
             self.__seleccionada = False
@@ -212,7 +216,7 @@ class Chip(CellContent):
         ventana.blit(self.image, self.rect)
 
     def grav(self, t):
-        y = self.y_inicial + self.v_inicial*t + 0.5*GRAVITY*t
+        y = self.y_initial + self.v_initial*t + 0.5*GRAVITY*t
         self.rect.centery = y
 
     def movCuadratico(self, t):
@@ -252,19 +256,6 @@ class UnbreakableBlock(CellContent):
 #  //
 #  Position
 #  //
-
-    def setCeldaOrigen(self, cell):
-        self.__origin_cell = cell
-
-    def getCeldaOrigen(self):
-        return self.__origin_cell
-
-    def setCeldaDestino(self, cell):
-        self.__target_cell = cell
-
-    def getCeldaDestino(self):
-        return self.__target_cell
-
     def setPosicionCentro(self, x, y):
         self.rect.centerx = x
         self.rect.centery = y
