@@ -54,12 +54,14 @@ class Celda(object):
     def seleccionarFicha(self):
         '''Marca la ficha correspondiente a\n
         esta celda como "seleccionada"'''
-        self.__ficha.set_seleccionada(True)
+        if(self.__ficha.get_class() != -2):
+            self.__ficha.set_seleccionada(True)
 
     def deseleccionarFicha(self):
         '''Pone en False la bandera\n
         "seleccionada" de la ficha'''
-        self.__ficha.set_seleccionada(False)
+        if(self.__ficha.get_class() != -2):
+            self.__ficha.set_seleccionada(False)
 
     def getFicha(self):
         return self.__ficha

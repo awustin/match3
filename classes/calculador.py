@@ -64,6 +64,14 @@ class Calculador(object):
                 ficha = self.generarFichaRan()
         return ficha
 
+    def set_unbreakables(self):
+        '''This will set unbreakable blocks in the matrix'''
+        if(self.__fichas == []):
+            return
+        # Read from a file or generate randoms
+        # For test I will put a block in position 0,0
+        self.__fichas[0][0] = -2
+
     def setFichasRan(self, n):
         '''Arma una matriz nxn de numeros aleatorios entre 1 y 4'''
         for row in range(n):

@@ -1,6 +1,7 @@
 # Handler
 from classes.calculador import Calculador
 from ficha import Ficha
+from block import Unbreakable
 
 
 class Handler(object):
@@ -14,6 +15,7 @@ class Handler(object):
         ''' Arma matriz de fichas aleatorias y devuelve dicha matriz.
         n es la dimension de la matriz cuadrada'''
         self.__calculador.setFichasRan(n)
+        self.__calculador.set_unbreakables()
         return self.__calculador.getFichas()
 
     def requestFichas(self, n=0):
@@ -32,9 +34,12 @@ class Handler(object):
             for row in range(len(enteros)):
                 fichas.append([])
                 for col in range(len(enteros[row])):
-                    if(enteros[row][col] != -1):
+                    item = enteros[row][col]
+                    if(item != -1 and item != -2):
                         token_class = enteros[row][col]
                         ficha = Ficha(token_class=token_class)
+                    elif(item == -2):
+                        ficha = Unbreakable()
                     else:
                         ficha = None
                     fichas[row].append(ficha)

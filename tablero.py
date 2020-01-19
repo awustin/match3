@@ -24,6 +24,7 @@ N_CELDAS = 8
 X_CELDA = X_CUAD/N_CELDAS
 VELOCIDAD_CAIDA = 7
 VELOCIDAD_RELLENO = 10
+NOT_CLICKABLE = [-1, -2]
 
 
 class Tablero:
@@ -428,6 +429,9 @@ class Tablero:
                 celda = self.__celdas[row][col]
                 if(celda.esClickeada(x, y) and celda.hayFicha()):
                     dentroCuadricula = True
+                    token_class = self.__celdas[row][col].getFicha().get_class()
+                    if(token_class in NOT_CLICKABLE):
+                        break
                     estadoFicha = self.handler.seleccionFichasYEstado(row, col)
                     selector.setPos(row, col)
                     if(estadoFicha['seleccionada']):
