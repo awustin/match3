@@ -8,7 +8,7 @@ N_CELDAS = 8
 class Selector(pygame.sprite.Sprite):
     def __init__(self, tablero):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load('.\\data\\images\\selector.png')
+        self.image = pygame.image.load('..\\assets\\images\\selector.png')
         self.rect = self.image.get_rect()
         self._coord = (0, 0)
         self._tablero = tablero

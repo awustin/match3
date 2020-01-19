@@ -4,7 +4,9 @@ import os
 import sys
 
 
-sys.path.insert(0, 'config')
+PROJECT_FOLDER = os.path.dirname(os.path.abspath(os.path.curdir))
+CONFIG_FOLDER = os.path.join(PROJECT_FOLDER, 'config')
+sys.path.insert(0, CONFIG_FOLDER)
 try:
     import globales
 except Exception as e:
@@ -12,7 +14,7 @@ except Exception as e:
     raise
 
 
-SPR_CONFIG_FILE = ".\\config\\sprites.json"
+SPR_CONFIG_FILE = os.path.join(CONFIG_FOLDER, 'sprites.json')
 SPRITES = {}
 
 

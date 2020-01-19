@@ -1,8 +1,7 @@
 import os
 
-ROOT_DIR = os.path.abspath(os.path.curdir)
-
-LOGO = os.path.join(ROOT_DIR, 'data\\images\\logoJelly.png')
+ROOT_DIR = os.path.dirname(os.path.abspath(os.path.curdir))
+LOGO = os.path.join(ROOT_DIR, 'assets\\images\\logoJelly.png')
 CAPTION = "Juego"
 DIMENSION = (700, 600)
 FONT = "C:\\Windows\\Fonts\\BAUHS93.TTF"

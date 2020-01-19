@@ -1,41 +1,41 @@
 {
     "default": {
-        "path": "data\\sprites\\ficha5.png",
+        "path": "assets\\sprites\\ficha5.png",
         "num_frames": 1,
         "width_px": 40,
         "height_px": 40,
         "anim_speed": 0
     },
     "-2": {
-        "path": "data\\sprites\\unbreakable.png",
+        "path": "assets\\sprites\\unbreakable.png",
         "num_frames": 1,
         "width_px": 60,
         "height_px": 60,
         "anim_speed": 0
     },
     "1": {
-        "path": "data\\sprites\\spr_mushroom1.png",
+        "path": "assets\\sprites\\spr_mushroom1.png",
         "num_frames": 33,
         "width_px": 60,
         "height_px": 60,
         "anim_speed": 0.4
     },
     "2": {
-        "path": "data\\sprites\\spr_mushroom2.png",
+        "path": "assets\\sprites\\spr_mushroom2.png",
         "num_frames": 33,
         "width_px": 60,
         "height_px": 60,
         "anim_speed": 0.35
     },
     "3": {
-        "path": "data\\sprites\\spr_mushroom3.png",
+        "path": "assets\\sprites\\spr_mushroom3.png",
         "num_frames": 50,
         "width_px": 60,
         "height_px": 60,
         "anim_speed": 0.4
     },
     "4": {
-        "path": "data\\sprites\\spr_mushroom4.png",
+        "path": "assets\\sprites\\spr_mushroom4.png",
         "num_frames": 50,
         "width_px": 60,
         "height_px": 60,
