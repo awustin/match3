@@ -1,7 +1,7 @@
 # Handler
 from classes.calculador import Calculador
-from ficha import Chip
-from ficha import UnbreakableBlock
+from cellContent import Chip
+from cellContent import UnbreakableBlock
 
 
 class Handler(object):

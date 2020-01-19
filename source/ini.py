@@ -11,8 +11,8 @@ from pantalla import Pantalla
 from texto import Texto
 from tablero import Tablero
 from selector import Selector
-from ficha import UnbreakableBlock
-from ficha import Chip
+from cellContent import UnbreakableBlock
+from cellContent import Chip
 import spritesData as sprites
 
 sys.path.insert(0, 'config')
