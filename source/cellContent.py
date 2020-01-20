@@ -1,12 +1,8 @@
-# Clase ficha:
-# Agrupa los estados de una ficha:
-# Ninguno, alineada, seleccionada
-# Además su animación: gravedad y sprite
 import pygame
 import spritesData
 
-GRAVITY = 1.2
-V_INTERCAMBIO = 7
+GRAVITY = 5
+SWAP_SPEED = 7
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -110,7 +106,7 @@ class CellContent(pygame.sprite.Sprite):
         self.rect.centery = y
 
     def __cuadratic_glide(self, t):
-        '''Obtengo direccion y modulo de v_intercambio'''
+        '''Gets module and direction'''
         delta = self.p2 - self.p1
         if(delta == (0, 0)):
             self.set_swapping(False)
@@ -120,14 +116,11 @@ class CellContent(pygame.sprite.Sprite):
                                          delta.y/abs(delta.x))
         else:
             direcc = pygame.math.Vector2(0, delta.y/abs(delta.y))
-        v_intercambio = V_INTERCAMBIO * direcc
-        # Obtengo t_intercambio
-        t_intercambio = 2 * delta.magnitude() / v_intercambio.magnitude()
-        # Obtengo aceleracion
-        a_intercambio = (-v_intercambio) / t_intercambio
-        # Obtengo posicion
-        p = self.p1 + v_intercambio * t + a_intercambio * 0.5 * t**2
-        if(t == int(t_intercambio)):
+        swap_vector = SWAP_SPEED * direcc
+        t_swap = 2 * delta.magnitude() / swap_vector.magnitude()
+        acceleration_swap = (-swap_vector) / t_swap
+        p = self.p1 + swap_vector * t + acceleration_swap * 0.5 * t**2
+        if(t == int(t_swap)):
             self.set_swapping(False)
         self.rect.centerx = p.x
         self.rect.centery = p.y
@@ -188,6 +181,9 @@ class Chip(CellContent):
     def is_selected(self):
         return self.__selected
 
+    def is_swapping(self):
+        return self.__swap
+
     def set_selected(self, flag):
         self.__selected = flag
         self._dropped = False
@@ -198,14 +194,14 @@ class Chip(CellContent):
         self._dropped = flag
         self.__swap = False
 
-    def is_swapping(self):
-        return self.__swap
-
     def set_swapping(self, flag):
         self.__selected = False
         self._dropped = False
         self.__swap = flag
 
+# //
+# Update
+# //
     def update(self, display):
         is_swapping = self.is_swapping()
         is_selected = self.is_selected()
