@@ -1,4 +1,3 @@
-# JUEGO
 import sys
 import pygame
 from random import random
@@ -13,6 +12,7 @@ from tablero import Tablero
 from selector import Selector
 from cellContent import UnbreakableBlock
 from cellContent import Chip
+from controllers.inputController import InputController
 import spritesData as sprites
 
 sys.path.insert(0, 'config')
@@ -27,39 +27,41 @@ class App:
     def __init__(self):
         pygame.init()
 
-    def render_inicio(self):
-        self.pantalla = Pantalla(*globales.DIMENSION)
-        self.pantalla.inicializarVentana(globales.LOGO, globales.CAPTION)
-        self.pantalla.colorFondo(globales.COLOR_FONDO)
+    def init_screen(self):
+        self.display = Pantalla(*globales.DIMENSION)
+        self.display.inicializarVentana(globales.LOGO, globales.CAPTION)
+        self.display.colorFondo(globales.COLOR_FONDO)
         self.mjeInicio = Texto(globales.TEXTO[0], globales.FONT,
                                (120, 3, 12), customEnums.TipoTexto.TITULO)
-        posX = self.pantalla.posicionCentrarX(self.mjeInicio.getSurface())
-        posY = self.pantalla.posicionCentrarY(self.mjeInicio.getSurface())
+        posX = self.display.posicionCentrarX(self.mjeInicio.getSurface())
+        posY = self.display.posicionCentrarY(self.mjeInicio.getSurface())
         self.mjeInicio.setPosicion(posX, posY)
         self.tablero = Tablero(color=(20, 40, 80))
         self.selector = Selector(self.tablero)
         sprites.init_sprite_data()
 
-    def ejecutar(self):
+    def main_menu(self):
+        action = InputController.MainMenuTick()
+        if action == 0:
+            return 0
+        if action == 'start':
+            self.partida()
+        if action == 'test':
+            self.test()
+        self.display.colorFondo(globales.COLOR_FONDO)
+        self.display.dibujar(self.mjeInicio.getSurface(),
+                             self.mjeInicio.getPosicion())
+        return 1
+
+    def run_game(self):
         clock = time.Clock()
-        gameOver = False
-        mjeInicio = self.mjeInicio
-        self.pantalla.dibujar(mjeInicio.getSurface(), mjeInicio.getPosicion())
-        while not gameOver:
-            for evento in event.get():
-                if evento.type == pygame.QUIT:
-                    gameOver = True
-                    sys.exit()
-                if evento.type == pygame.KEYDOWN:
-                    if(evento.key == pygame.K_RETURN):
-                        self.partida()
-                    if(evento.key == pygame.K_t):
-                        self.test()
-            self.pantalla.colorFondo(globales.COLOR_FONDO)
-            self.pantalla.dibujar(mjeInicio.getSurface(),
-                                  mjeInicio.getPosicion())
+        game_over = False
+        while not game_over:
+            if self.main_menu() == 0:
+                game_over = True
             pygame.display.update()
             clock.tick_busy_loop(50)
+        pygame.quit()
 
     def partida(self):
         gameOver = False
@@ -82,16 +84,16 @@ class App:
                 if(evento.type == pygame.MOUSEBUTTONDOWN):
                     if(mouse.get_pressed()[0] == 1):
                         self.tablero.clickXY(*mouse.get_pos(), self.selector,
-                                             self.pantalla.getDisplay(),
+                                             self.display.getDisplay(),
                                              colorPpal)
-            self.pantalla.colorFondo(colorPpal)
+            self.display.colorFondo(colorPpal)
             hayAlineaciones = self.tablero.actualizarTableroConEstado(
-                                          self.pantalla.getDisplay())
+                                          self.display.getDisplay())
             if(hayAlineaciones):
-                self.tablero.alineacionEnTablero(self.pantalla.getDisplay(),
+                self.tablero.alineacionEnTablero(self.display.getDisplay(),
                                                  colorPpal)
             self.tablero.posicionarSelector(*mouse.get_pos(), self.selector)
-            self.selector.update(self.pantalla.getDisplay())
+            self.selector.update(self.display.getDisplay())
             pygame.display.update()
 
     def test(self):
@@ -109,7 +111,7 @@ class App:
             items.append(item)
         for item in items:
             item_group.add(item)
-        item_group.draw(self.pantalla.getDisplay())
+        item_group.draw(self.display.getDisplay())
         while(not gameOver):
             for evento in event.get():
                 if(evento.type == pygame.QUIT):
@@ -120,12 +122,12 @@ class App:
                 if(evento.type == pygame.KEYDOWN):
                     if(evento.key == pygame.K_a):
                         return
-            self.pantalla.colorFondo(colorPpal)
-            item_group.update(self.pantalla.getDisplay())
+            self.display.colorFondo(colorPpal)
+            item_group.update(self.display.getDisplay())
             pygame.display.update()
 
 
 if __name__ == "__main__":
     theApp = App()
-    theApp.render_inicio()
-    theApp.ejecutar()
+    theApp.init_screen()
+    theApp.run_game()

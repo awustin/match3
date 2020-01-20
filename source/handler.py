@@ -1,5 +1,5 @@
 # Handler
-from classes.calculador import Calculador
+from model.calculador import Calculador
 from cellContent import Chip
 from cellContent import UnbreakableBlock
 

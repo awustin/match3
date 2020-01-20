@@ -1,6 +1,6 @@
 # Calculador
 from random import random
-from classes.alineacion import Alineacion
+from model.alineacion import Alineacion
 
 
 class Calculador(object):
