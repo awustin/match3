@@ -40,7 +40,7 @@ class Selector(pygame.sprite.Sprite):
         if(self._celdas != []):
             x = self._coord[0]
             y = self._coord[1]
-            centro = self._celdas[x][y].getPosicionCentro()
+            centro = self._celdas[x][y].get_center_pos()
             self.rect.center = centro
 
     def izquierda(self):

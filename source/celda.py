@@ -48,20 +48,20 @@ class Celda(object):
             self.__ficha = ficha
         else:
             self.__ficha = ficha
-        centro = self.getPosicionCentro()
-        self.__ficha.setPosicionCentro(*centro)
+        centro = self.get_center_pos()
+        self.__ficha.set_center_pos(*centro)
 
     def seleccionarFicha(self):
         '''Marca la ficha correspondiente a\n
         esta celda como "seleccionada"'''
         if(self.__ficha.get_class() != -2):
-            self.__ficha.set_seleccionada(True)
+            self.__ficha.set_selected(True)
 
     def deseleccionarFicha(self):
         '''Pone en False la bandera\n
         "seleccionada" de la ficha'''
         if(self.__ficha.get_class() != -2):
-            self.__ficha.set_seleccionada(False)
+            self.__ficha.set_selected(False)
 
     def get_cell_content(self):
         return self.__ficha
@@ -85,10 +85,10 @@ class Celda(object):
     def getRect(self):
         return self.__rect
 
-    def getPosicionCentro(self):
+    def get_center_pos(self):
         return self.__rect.center
 
-    def setPosicionCentro(self, x, y):
+    def set_center_pos(self, x, y):
         self.__rect.center = (x, y)
 
     def esClickeada(self, x, y):
@@ -112,5 +112,5 @@ class Celda(object):
         '''Calcula la distancia vertical (en pixeles)
         entre los centros de esta celda y la celda que se
         pasa como argumento'''
-        distancia = self.getPosicionCentro()[0] - celda.getPosicionCentro()[0]
+        distancia = self.get_center_pos()[0] - celda.get_center_pos()[0]
         return abs(distancia)

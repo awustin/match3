@@ -105,7 +105,7 @@ class App:
                 item = UnbreakableBlock()
             else:
                 item = Chip(cell_class=i)
-            item.setPosicionCentro(i*70 + 40, 60)
+            item.set_center_pos(i*70 + 40, 60)
             items.append(item)
         for item in items:
             item_group.add(item)

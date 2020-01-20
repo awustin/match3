@@ -143,7 +143,7 @@ class Tablero:
                     draw.rect(ventana, celda.getColorCelda(), celda.getRect())
             for ficha in self.__grupoFichas:
                 self.__estanCayendo = False
-                if(ficha.estaCayendo()):
+                if(ficha.is_falling()):
                     self.__estanCayendo = True
                     break
             self.__grupoFichas.update(ventana)
@@ -156,9 +156,9 @@ class Tablero:
             for row in reversed(range(N_CELDAS)):
                 ficha = self.__celdas[row][col].get_cell_content()
                 if(ficha is not None):
-                    celdaDestino = ficha.getCeldaDestino()
+                    celdaDestino = ficha.get_target_cell()
                     if(celdaDestino is not None):
-                        celdaOrigen = ficha.getCeldaOrigen()
+                        celdaOrigen = ficha.get_origin_cell()
                         celdaOrigen.pasarFicha(celdaDestino)
                         ficha.set_target_cell(None)
                         ficha.set_origin_cell(celdaDestino)
@@ -198,12 +198,12 @@ class Tablero:
                         j += 1
                     if(agujerosDebajo != 0):
                         celdaDestino = self.__celdas[row + agujerosDebajo][col]
-                        celdaOrigen.get_cell_content().setPosicionFinalCaida(
+                        celdaOrigen.get_cell_content().set_target_position(
                                               celdaDestino.
-                                              getPosicionCentro()[1])
-                        celdaOrigen.get_cell_content().setVelocidadInicial(
+                                              get_center_pos()[1])
+                        celdaOrigen.get_cell_content().set_initial_speed(
                                                VELOCIDAD_CAIDA)
-                        celdaOrigen.get_cell_content().setCae(True)
+                        celdaOrigen.get_cell_content().set_dropped(True)
                         celdaOrigen.get_cell_content() \
                             .set_origin_cell(celdaOrigen)
                         celdaOrigen.get_cell_content() \
@@ -260,7 +260,7 @@ class Tablero:
             for ficha in nuevaFila:
                 if(ficha is not None):
                     self.__estanCayendo = False
-                    if(ficha.estaCayendo()):
+                    if(ficha.is_falling()):
                         self.__estanCayendo = True
                         break
             self.__grupoFichas.update(ventana)
@@ -275,23 +275,23 @@ class Tablero:
                 nuevaFila = self.handler.requestNuevasFichasPorFila(row)
                 for col in range(len(nuevaFila)):
                     posicionAparecen = self.__celdas[0][col]. \
-                                       getPosicionCentro()
+                                       get_center_pos()
                     if(nuevaFila[col] is not None):
                         ficha = nuevaFila[col]
                         celdaDestino = self.__celdas[row][col]
-                        ficha.setPosicionCentro(*posicionAparecen)
+                        ficha.set_center_pos(*posicionAparecen)
                         ficha.set_target_cell(celdaDestino)
-                        ficha.setPosicionFinalCaida(
-                              celdaDestino.getPosicionCentro()[1])
-                        ficha.setVelocidadInicial(VELOCIDAD_RELLENO)
+                        ficha.set_target_position(
+                              celdaDestino.get_center_pos()[1])
+                        ficha.set_initial_speed(VELOCIDAD_RELLENO)
                         self.agregarFichasAGrupo(ficha)
-                        ficha.setCae(True)
+                        ficha.set_dropped(True)
                         self.__estanCayendo = True
                         self.actualizarFilaCaenNuevasFichas(
                             ventana, colorFondo, nuevaFila)
                 for ficha in nuevaFila:
                     if(ficha is not None):
-                        celdaDestino = ficha.getCeldaDestino()
+                        celdaDestino = ficha.get_target_cell()
                         celdaDestino.setFicha(ficha=ficha)
                         ficha.set_target_cell(None)
                         ficha.set_origin_cell(celdaDestino)
@@ -384,7 +384,7 @@ class Tablero:
             for ficha in swapping:
                 if(ficha is not None):
                     self.__estanSwapping = False
-                    if(ficha.estaIntercambiando()):
+                    if(ficha.is_swapping()):
                         self.__estanSwapping = True
                         break
             self.__grupoFichas.update(ventana)
@@ -399,12 +399,12 @@ class Tablero:
         ficha1 = celda1.get_cell_content()
         ficha1.set_origin_cell(celda1)
         ficha1.set_target_cell(celda2)
-        ficha1.setIntercambio(True)
+        ficha1.set_swapping(True)
         # Asignar ficha origen y destino: Ficha 2
         ficha2 = celda2.get_cell_content()
         ficha2.set_origin_cell(celda2)
         ficha2.set_target_cell(celda1)
-        ficha2.setIntercambio(True)
+        ficha2.set_swapping(True)
         self.__estanSwapping = True
         fichasSwapping.append(ficha1)
         fichasSwapping.append(ficha2)
