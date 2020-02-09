@@ -6,13 +6,13 @@ N_CELDAS = 8
 
 
 class Selector(pygame.sprite.Sprite):
-    def __init__(self, tablero):
+    def __init__(self, board):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load('..\\assets\\images\\selector.png')
         self.rect = self.image.get_rect()
         self._coord = (0, 0)
-        self._tablero = tablero
-        self._celdas = tablero.getCeldas()
+        self._board = board
+        self._celdas = board.getCeldas()
         self._posicionar()
 
 #   \\
@@ -32,7 +32,7 @@ class Selector(pygame.sprite.Sprite):
 
     def _setCeldas(self):
         '''Pide las celdas'''
-        self._celdas = self._tablero.getCeldas()
+        self._celdas = self._board.getCeldas()
 
     def _posicionar(self):
         '''Posiciona el selector en la celda

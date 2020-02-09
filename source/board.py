@@ -1,4 +1,4 @@
-# Tablero
+# Board
 # Celdas de 50x50 (8x8 celdas)
 import sys
 import pygame
@@ -18,18 +18,22 @@ except Exception as e:
 
 X_CUAD = 480
 Y_CUAD = X_CUAD
+BASE_CELL_COLOR = (20, 40, 80)
+BKG_COLOR = (120, 100, 50)
 X_OFF = (globales.DIMENSION[0] - X_CUAD) / 2
 Y_OFF = (globales.DIMENSION[1] - Y_CUAD) / 2
 N_CELDAS = 8
 X_CELDA = X_CUAD/N_CELDAS
+X_SPACING = 5
 VELOCIDAD_CAIDA = 7
 VELOCIDAD_RELLENO = 10
 NOT_CLICKABLE = [-1, -2]
 
 
-class Tablero:
-    def __init__(self, tam=(X_CUAD, X_CUAD), color=(1, 1, 1)):
+class Board:
+    def __init__(self, viewer, tam=(X_CUAD, X_CUAD), color=BASE_CELL_COLOR):
         self.handler = Handler(N_CELDAS)
+        self.__view = viewer
         self.__color_base = color
         self.__celdas = []
         self.__celdasEstanCompletas = False
@@ -81,8 +85,7 @@ class Tablero:
         b = color[2] + difb
         return (r, g, b)
 
-    def generarTableroFilaPorFila(self, ventana, x_celda, x_espaciado,
-                                  color_base, fichas):
+    def generarTableroFilaPorFila(self, fichas):
         ''' Cuando las celdas no estén completas, se deberá
         generarlas.\n
         Luego, se pide la matriz de fichas random\n
@@ -92,30 +95,23 @@ class Tablero:
         x_celda es el tamaño de la celda\n
         x_espaciado es el ancho del espaciado entre celdas\n
         color_base es el color base de la celda'''
-        color = color_base
+        color = BASE_CELL_COLOR
         for row in range(len(fichas)):
             self.__celdas.append([])
             for col in range(len(fichas[row])):
                 color = self.gradiente(color)
-                celda = Celda(x_celda, x_celda, col*(x_celda+x_espaciado) +
-                              X_OFF, row*(x_celda+x_espaciado) + Y_OFF,
+                celda = Celda(X_CELDA, X_CELDA, col*(X_CELDA+X_SPACING) +
+                              X_OFF, row*(X_CELDA+X_SPACING) + Y_OFF,
                               color)
                 celda.setColorCelda(color)
                 celda.setCoord(row, col)
-                rect = celda.getRect()
-                draw.rect(ventana, color, rect)
-                self.__celdas[row].append(celda)
-        pygame.display.update()
-        for row in reversed(range(len(fichas))):
-            for col in range(len(fichas)):
-                celda = self.__celdas[row][col]
                 celda.setFicha(ficha=fichas[row][col])
-                time.wait(5)
-                fichas[row][col].update(ventana)
-                pygame.display.update()
+                self.__celdas[row].append(celda)
                 if(row == len(self.__celdas)-1
                    and col == len(self.__celdas[row])-1):
                     self.__celdasEstanCompletas = True
+        self.__view.draw_cells(self.__celdas)
+        self.__view.draw_initial_chips(fichas)
 
     def buscarAlineacionFichas(self):
         '''Pide que se determinen las alineaciones.
@@ -305,7 +301,7 @@ class Tablero:
         self.__alineaciones = []
         self.__matches = False
 
-    def actualizarTableroCompleto(self, ventana, x_celda, x_espaciado):
+    def actualizarTableroCompleto(self):
         '''Actualiza el tablero. Sin pedir fichas al calculador.
         Si está completo (ya se dibujaron todas las celdas),
         recorre la matriz de celdas en busca de cambios de
@@ -325,8 +321,6 @@ class Tablero:
                 else:
                     '''La ficha se eliminó'''
                     self.__celdas[row][col].borrarFicha()
-                draw.rect(ventana, celda.getColorCelda(), celda.getRect())
-        self.__grupoFichas.update(ventana)
 
     def agregarFichasAGrupo(self, fichas):
         try:
@@ -338,22 +332,23 @@ class Tablero:
             if(fichas is not None):
                 self.__grupoFichas.add(fichas)
 
-    def actualizarTableroConEstado(self, ventana):
+    def main_board_update(self):
         ''' Actualiza el tablero, segun el estado de las fichas
         y las alineaciones.\n
         El programa principal debe llamar a esta función en cada iteración'''
-        color_base = self.__color_base
         if(not self.__celdasEstanCompletas):
             fichas = self.handler.requestFichas(N_CELDAS)
             self.agregarFichasAGrupo(fichas)
-            self.generarTableroFilaPorFila(ventana, X_CELDA, 5, color_base,
-                                           fichas)
+            self.generarTableroFilaPorFila(fichas)
         else:
             if(self.__matches):
                 return self.__matches
             self.enviarActualizacionAlineaciones()
-            self.actualizarTableroCompleto(ventana, X_CELDA, 5)
+            self.actualizarTableroCompleto()
             self.__matches = self.buscarAlineacionFichas()
+            self.__view.draw_cells(self.__celdas)
+            self.__view.update_chips(self.__grupoFichas)
+
 
     def deseleccionarTodasCeldas(self):
         '''Recorre la matriz de celdas y deselecciona
