@@ -48,10 +48,7 @@ class App:
             action = self.__game_controller.events_tick()
             if action == 'exit':
                 return action
-            aligned = self.__game_controller.main_board_tick()
-            #if(aligned):
-            #    _board.alineacionEnTablero(self.display.get_display(),
-            #                               BKG_COLOR)
+            self.__game_controller.main_board_tick()
             self.__game_controller.selector_tick()
             pygame.display.update()
 

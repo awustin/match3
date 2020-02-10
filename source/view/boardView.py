@@ -24,9 +24,6 @@ class BoardView():
         else:
             BoardView.__instance = self
 
-    def update_selector(self, x, y):
-        self.__select.update(self.__display)
-
 # DRAW FUNCTIONS -----------------------------------------
     def update_background(self):
         global BKG_COLOR
@@ -46,9 +43,57 @@ class BoardView():
                 chip_array[row][col].update(self.__display.get_display())
                 pygame.display.update()
 
+    def draw_swapping_chips(self, cell_array, swapping, sprite_group):
+        '''Actualiza el tablero mientras se intercambian fichas'''
+        chips_are_swapping = True
+        display = self.__display.get_display()
+        while(chips_are_swapping):
+            display.fill(BKG_COLOR)
+            self.draw_cells(cell_array)
+            for ficha in swapping:
+                if(ficha is not None):
+                    chips_are_swapping = False
+                    if(ficha.is_swapping()):
+                        chips_are_swapping = True
+                        break
+            sprite_group.update(display)
+            pygame.display.update()
+
+    def draw_falling_chips(self, cell_array, sprite_group):
+        '''Actualiza el tablero para la transición de
+        la caida de fichas'''
+        chips_are_falling = True
+        display = self.__display.get_display()
+        while chips_are_falling:
+            display.fill(BKG_COLOR)
+            self.draw_cells(cell_array)
+            for ficha in sprite_group:
+                chips_are_falling = False
+                if(ficha.is_falling()):
+                    chips_are_falling = True
+                    break
+            sprite_group.update(display)
+            pygame.display.update()
+    
+    def draw_filling_board(self, new_row, cell_array, sprite_group):
+        '''Actualiza la fila para la transición de
+        la caida de fichas cuando hay nuevas fichas que rellenan agujeros'''
+        chips_are_falling = True
+        display = self.__display.get_display()
+        while chips_are_falling:
+            display.fill(BKG_COLOR)
+            self.draw_cells(cell_array)
+            for chip in new_row:
+                if(chip is not None):
+                    chips_are_falling = False
+                    if(chip.is_falling()):
+                        chips_are_falling = True
+                        break
+            sprite_group.update(display)
+            pygame.display.update()
+
     def update_chips(self, sprite_group):
         sprite_group.update(self.__display.get_display())
 
-# COLOR FUNCTIONS ----------------------------------------------------------------
-    def gradient(color):
-        return color
+    def update_selector_position(self, selector):
+        selector.update(self.__display.get_display())

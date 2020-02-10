@@ -23,7 +23,7 @@ class GameController():
                     self.action_reset()
             if(event.type == pygame.MOUSEBUTTONDOWN):
                 if(pygame.mouse.get_pressed()[0] == 1):
-                    self.action_click()
+                    self.action_click(*pygame.mouse.get_pos())
         return 1
 
 # INITIALIZATION ----------------------------------------------------
@@ -46,10 +46,10 @@ class GameController():
 
     def selector_tick(self):
         coord = pygame.mouse.get_pos()
-        # Al modelo -> cambiar posicion selector
-        # self.__board_view.posicionarSelector(x, y, selector)
-        # A la vista -> refrescar selector
-        # self.__board_view.update_selector(*coord, self.__display)
+        position = self.__board.posicionarSelector(*coord)
+        if position is not None:
+            self.__selector.setPos(*position)
+            self.__board_view.update_selector_position(self.__selector)
 
     def action_reset(self):
         global BKG_COLOR
@@ -57,9 +57,14 @@ class GameController():
         self.__board.reiniciaFichasCeldasTablero()
         BKG_COLOR = (random()*255, random()*255, random()*255)
 
-    def action_click(self):
-        pass
+    def action_click(self, x, y):
+        self.__board.clickXY(x, y)
+
+    def action_aligned(self):
+        self.__board.alineacionEnTablero()
 
     def main_board_tick(self):
         self.__board_view.update_background()
-        self.__board.main_board_update()
+        chips_algined = self.__board.main_board_update()
+        if chips_algined:
+            self.action_aligned()

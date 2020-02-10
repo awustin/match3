@@ -175,7 +175,7 @@ class Board:
         self.handler.enviarConfiguracionTablero(enteros)
         return enteros
 
-    def ocuparAgujeros(self, ventana, colorFondo, columnas):
+    def ocuparAgujeros(self, columnas):
         '''Las fichas eliminadas dejan agujeros.
         las fichas que estan encima, empiezan a caer ocupando
         su lugar\n
@@ -205,7 +205,8 @@ class Board:
                         celdaOrigen.get_cell_content() \
                             .set_target_cell(celdaDestino)
                         self.__estanCayendo = True
-        self.actualizarTableroCaenFichas(ventana, colorFondo)
+        self.__view.draw_falling_chips(self.__celdas, self.__grupoFichas)
+        # self.actualizarTableroCaenFichas(ventana, colorFondo)
         self.asignarANuevasCeldas(columnas)
 
     def eliminarFichasAlineadas(self):
@@ -262,7 +263,7 @@ class Board:
             self.__grupoFichas.update(ventana)
             pygame.display.update()
 
-    def nuevasFichasPorFilas(self, ventana, colorFondo):
+    def nuevasFichasPorFilas(self):
         '''Pide al calculador las nuevas fichas
         para completar el tablero'''
         self.enviarActualizacionAlineaciones()
@@ -283,8 +284,9 @@ class Board:
                         self.agregarFichasAGrupo(ficha)
                         ficha.set_dropped(True)
                         self.__estanCayendo = True
-                        self.actualizarFilaCaenNuevasFichas(
-                            ventana, colorFondo, nuevaFila)
+                        self.__view.draw_filling_board(nuevaFila,
+                                                       self.__celdas,
+                                                       self.__grupoFichas)
                 for ficha in nuevaFila:
                     if(ficha is not None):
                         celdaDestino = ficha.get_target_cell()
@@ -293,11 +295,11 @@ class Board:
                         ficha.set_origin_cell(celdaDestino)
         self.enviarActualizacionAlineaciones()
 
-    def alineacionEnTablero(self, ventana, colorFondo):
+    def alineacionEnTablero(self):
         if(self.__alineaciones != []):
             columnas = self.eliminarFichasAlineadas()
-            self.ocuparAgujeros(ventana, colorFondo, columnas)
-            self.nuevasFichasPorFilas(ventana, colorFondo)
+            self.ocuparAgujeros(columnas)
+            self.nuevasFichasPorFilas()
         self.__alineaciones = []
         self.__matches = False
 
@@ -349,7 +351,6 @@ class Board:
             self.__view.draw_cells(self.__celdas)
             self.__view.update_chips(self.__grupoFichas)
 
-
     def deseleccionarTodasCeldas(self):
         '''Recorre la matriz de celdas y deselecciona
         una por una'''
@@ -385,7 +386,7 @@ class Board:
             self.__grupoFichas.update(ventana)
             pygame.display.update()
 
-    def swapFichas(self, ventana, colorFondo, x1, y1, x2, y2):
+    def swapFichas(self, x1, y1, x2, y2):
         '''Intercambia las fichas entre las celdas'''
         celda1 = self.__celdas[x1][y1]
         celda2 = self.__celdas[x2][y2]
@@ -404,7 +405,8 @@ class Board:
         fichasSwapping.append(ficha1)
         fichasSwapping.append(ficha2)
         # Actualizar durante animacion
-        self.actualizarTableroSwapping(ventana, colorFondo, fichasSwapping)
+        self.__view.draw_swapping_chips(self.__celdas, fichasSwapping,
+                                        self.__grupoFichas)
         # Setear celdaOrigen
         ficha1.set_origin_cell(celda2)
         ficha2.set_origin_cell(celda1)
@@ -413,7 +415,7 @@ class Board:
         celda1.setFicha(ficha=ficha2)
         celda2.setFicha(ficha=ficha1)
 
-    def clickXY(self, x, y, selector, ventana, colorFondo):
+    def clickXY(self, x, y):
         '''Busca cuál fue la casilla clickeada
         y dispara la lógica de selección de las fichas'''
         limpiar = False
@@ -431,7 +433,6 @@ class Board:
                     if(token_class in NOT_CLICKABLE):
                         break
                     estadoFicha = self.handler.seleccionFichasYEstado(row, col)
-                    selector.setPos(row, col)
                     if(estadoFicha['seleccionada']):
                         celda.seleccionarFicha()
                     else:
@@ -441,8 +442,7 @@ class Board:
                         celda.deseleccionarFicha()
                     if(estadoFicha['swap']):
                         p0 = estadoFicha['anterior']
-                        self.swapFichas(ventana, colorFondo, row, col,
-                                        p0[0], p0[1])
+                        self.swapFichas(row, col, p0[0], p0[1])
                         self.enviarActualizacionAlineaciones()
                         limpiar = True
                         break
@@ -452,10 +452,9 @@ class Board:
         if(limpiar):
             self.limpiarSeleccionCeldas()
 
-    def posicionarSelector(self, x, y, selector):
+    def posicionarSelector(self, x, y):
         for row in range(len(self.__celdas)):
             for col in range(len(self.__celdas[row])):
                 celda = self.__celdas[row][col]
                 if(celda.getRect().collidepoint(x, y)):
-                    selector.setPos(row, col)
-                    return
+                    return (row, col)
