@@ -2,7 +2,7 @@ import pygame
 from random import random
 from view.displayView import DisplayView
 from view.boardView import BoardView
-from board import Board
+from model.board import Board
 from selector import Selector
 
 
@@ -46,7 +46,7 @@ class GameController():
 
     def selector_tick(self):
         coord = pygame.mouse.get_pos()
-        position = self.__board.posicionarSelector(*coord)
+        position = self.__board.locate_selector(*coord)
         if position is not None:
             self.__selector.setPos(*position)
             self.__board_view.update_selector_position(self.__selector)
@@ -54,17 +54,17 @@ class GameController():
     def action_reset(self):
         global BKG_COLOR
         self.__selector.setPos(0, 0)
-        self.__board.reiniciaFichasCeldasTablero()
+        self.__board.restart_board()
         BKG_COLOR = (random()*255, random()*255, random()*255)
 
     def action_click(self, x, y):
-        self.__board.clickXY(x, y)
-
-    def action_aligned(self):
-        self.__board.alineacionEnTablero()
+        self.__board.click_action(x, y)
 
     def main_board_tick(self):
         self.__board_view.update_background()
-        chips_algined = self.__board.main_board_update()
-        if chips_algined:
-            self.action_aligned()
+        aligned_list = self.__board.main_board_update()
+        if (aligned_list != []):
+            incomplete_columns = self.__board.eliminate_aligned_chips()
+            self.__board.pass_chips_between_cells(incomplete_columns)
+            self.__board.new_chips_per_row()
+            self.__board.clear_aligned_list()

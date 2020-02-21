@@ -1,12 +1,10 @@
 # Board
 # Celdas de 50x50 (8x8 celdas)
 import sys
-import pygame
-from pygame import draw
-from pygame import time
 from pygame import sprite
 from handler import Handler
 from celda import Celda
+# from model.score import Score
 from random import random
 
 sys.path.insert(0, 'config')
@@ -34,43 +32,45 @@ class Board:
     def __init__(self, viewer, tam=(X_CUAD, X_CUAD), color=BASE_CELL_COLOR):
         self.handler = Handler(N_CELDAS)
         self.__view = viewer
-        self.__color_base = color
-        self.__celdas = []
-        self.__celdasEstanCompletas = False
-        self.__grupoFichas = sprite.Group()
-        self.__alineaciones = []
-        self.__matches = False
-        self.__fichasEntreCeldas = []
-        self.__estanCayendo = False
-        self.__estanSwapping = False
+        self.__base_color = color
+        self.__cells_array = []
+        self.__cells_ready = False
+        self.__chips_spr_group = sprite.Group()
+        self.__aligned_list = []
 
-    def getCeldas(self):
+    def get_aligned_list(self):
+        return self.__aligned_list
+
+    def clear_aligned_list(self):
+        self.__aligned_list = []
+
+    def get_cells(self):
         '''Devuelve la matriz de celdas'''
-        return self.__celdas
+        return self.__cells_array
 
-    def reiniciarMatrizCeldas(self):
-        self.__celdas.clear()
-        self.__celdas = []
+    def clear_cells_array(self):
+        self.__cells_array.clear()
+        self.__cells_array = []
 
-    def reiniciarCalculador(self):
+    def restart_chips(self):
         '''Reinicia el calculador:\n
         Vacia la lista de alineadas\n
         Vacia la lista de seleccion\n
         Recarga una matriz de enteros random\n'''
-        self.handler.reiniciarCalculador()
+        self.handler.restart_chips()
 
-    def reiniciaFichasCeldasTablero(self):
+    def restart_board(self):
         '''Vacía la matriz de celdas,\n
         Vacía la matriz de fichas\n
         Pone las banderas en su estado inicial'''
-        self.reiniciarMatrizCeldas()
-        self.reiniciarCalculador()
-        self.__matches = False
-        self.__celdasEstanCompletas = False
-        self.__grupoFichas.empty()
-        self.__color_base = (random()*255, random()*255, random()*255)
+        self.clear_cells_array()
+        self.restart_chips()
+        self.__aligned_list = []
+        self.__cells_ready = False
+        self.__chips_spr_group.empty()
+        self.__base_color = (random()*255, random()*255, random()*255)
 
-    def gradiente(self, color):
+    def __gradient(self, color):
         difr = 50*random()
         difg = 50*random()
         difb = 50*random()
@@ -85,7 +85,7 @@ class Board:
         b = color[2] + difb
         return (r, g, b)
 
-    def generarTableroFilaPorFila(self, fichas):
+    def start_board(self, fichas):
         ''' Cuando las celdas no estén completas, se deberá
         generarlas.\n
         Luego, se pide la matriz de fichas random\n
@@ -97,60 +97,35 @@ class Board:
         color_base es el color base de la celda'''
         color = BASE_CELL_COLOR
         for row in range(len(fichas)):
-            self.__celdas.append([])
+            self.__cells_array.append([])
             for col in range(len(fichas[row])):
-                color = self.gradiente(color)
+                color = self.__gradient(color)
                 celda = Celda(X_CELDA, X_CELDA, col*(X_CELDA+X_SPACING) +
                               X_OFF, row*(X_CELDA+X_SPACING) + Y_OFF,
                               color)
                 celda.setColorCelda(color)
                 celda.setCoord(row, col)
                 celda.setFicha(ficha=fichas[row][col])
-                self.__celdas[row].append(celda)
-                if(row == len(self.__celdas)-1
-                   and col == len(self.__celdas[row])-1):
-                    self.__celdasEstanCompletas = True
-        self.__view.draw_cells(self.__celdas)
+                self.__cells_array[row].append(celda)
+                if(row == len(self.__cells_array)-1
+                   and col == len(self.__cells_array[row])-1):
+                    self.__cells_ready = True
+        self.__view.draw_cells(self.__cells_array)
         self.__view.draw_initial_chips(fichas)
 
-    def buscarAlineacionFichas(self):
+    def scan_alignments(self):
         '''Pide que se determinen las alineaciones.
         El calculador revisa su lista de alineaciones'''
-        self.enviarActualizacionAlineaciones()
-        if(self.__alineaciones == []):
-            alineaciones = self.handler.buscarAlineaciones()
-            if(not alineaciones):
-                return False
-            else:
-                self.__alineaciones = alineaciones
-                return True
-        else:
-            return True
+        self.update_chips_calculator()
+        if(self.__aligned_list == []):
+            self.__aligned_list = self.handler.buscarAlineaciones()
 
-    def actualizarTableroCaenFichas(self, ventana, colorFondo):
-        '''Actualiza el tablero para la transición de
-        la caida de fichas'''
-        while(self.__estanCayendo):
-            ventana.fill(colorFondo)
-            celdas = self.__celdas
-            for row in range(len(celdas)):
-                for col in range(len(celdas[row])):
-                    celda = celdas[row][col]
-                    draw.rect(ventana, celda.getColorCelda(), celda.getRect())
-            for ficha in self.__grupoFichas:
-                self.__estanCayendo = False
-                if(ficha.is_falling()):
-                    self.__estanCayendo = True
-                    break
-            self.__grupoFichas.update(ventana)
-            pygame.display.update()
-
-    def asignarANuevasCeldas(self, columnas):
+    def asign_new_origin_cells(self, columnas):
         '''A las fichas que ya existen y ya cayeron,
-        les es asignada su celda destino'''
+        les es asignada su celda origen'''
         for col in columnas:
             for row in reversed(range(N_CELDAS)):
-                ficha = self.__celdas[row][col].get_cell_content()
+                ficha = self.__cells_array[row][col].get_cell_content()
                 if(ficha is not None):
                     celdaDestino = ficha.get_target_cell()
                     if(celdaDestino is not None):
@@ -159,15 +134,15 @@ class Board:
                         ficha.set_target_cell(None)
                         ficha.set_origin_cell(celdaDestino)
 
-    def enviarActualizacionAlineaciones(self):
+    def update_chips_calculator(self):
         '''Tras un pasaje de fichas por un alineacion,
         se envia al calculador la nueva configuracion'''
         enteros = []
-        for row in range(len(self.__celdas)):
+        for row in range(len(self.__cells_array)):
             enteros.append([])
-            for col in range(len(self.__celdas[row])):
-                if(self.__celdas[row][col].hayFicha()):
-                    ficha = self.__celdas[row][col].get_cell_content()
+            for col in range(len(self.__cells_array[row])):
+                if(self.__cells_array[row][col].hayFicha()):
+                    ficha = self.__cells_array[row][col].get_cell_content()
                     token_class = ficha.get_class()
                     enteros[row].append(token_class)
                 else:
@@ -175,13 +150,13 @@ class Board:
         self.handler.enviarConfiguracionTablero(enteros)
         return enteros
 
-    def ocuparAgujeros(self, columnas):
+    def pass_chips_between_cells(self, columnas):
         '''Las fichas eliminadas dejan agujeros.
         las fichas que estan encima, empiezan a caer ocupando
         su lugar\n
         Usa la lista de tuplas (celdaOrigen, celdaDestino)
         entre las que se deben pasar las fichas'''
-        celdas = self.__celdas
+        celdas = self.__cells_array
         for col in columnas:
             for row in range(N_CELDAS):
                 celdaOrigen = celdas[row][col]
@@ -193,7 +168,7 @@ class Board:
                             agujerosDebajo += 1
                         j += 1
                     if(agujerosDebajo != 0):
-                        celdaDestino = self.__celdas[row + agujerosDebajo][col]
+                        celdaDestino = self.__cells_array[row + agujerosDebajo][col]
                         celdaOrigen.get_cell_content().set_target_position(
                                               celdaDestino.
                                               get_center_pos()[1])
@@ -204,192 +179,147 @@ class Board:
                             .set_origin_cell(celdaOrigen)
                         celdaOrigen.get_cell_content() \
                             .set_target_cell(celdaDestino)
-                        self.__estanCayendo = True
-        self.__view.draw_falling_chips(self.__celdas, self.__grupoFichas)
-        # self.actualizarTableroCaenFichas(ventana, colorFondo)
-        self.asignarANuevasCeldas(columnas)
+        self.__view.draw_falling_chips(self.__cells_array, self.__chips_spr_group)
+        self.asign_new_origin_cells(columnas)
 
-    def eliminarFichasAlineadas(self):
+    def kill_and_score(self, row, col):
+        '''Scoring an aligned chip.
+        This will eliminate it.'''
+        print(f'{row} , {col} SCORES! ')
+        pass
+
+    def eliminate_aligned_chips(self):
         '''Elimina las fichas que se alinearon,
         y devuelve un conjunto con las columnas
         que tienen agujeros'''
-        horizontales = self.__alineaciones[0]
-        verticales = self.__alineaciones[1]
-        columnasConAgujeros = set()
-        for alineacion in horizontales:
-            for item in alineacion:
+        horizontal = self.__aligned_list[0]
+        vertical = self.__aligned_list[1]
+        incomplete_columns = set()
+        for alginment in horizontal:
+            for item in alginment:
                 row = item[0]
                 col = item[1]
-                ficha = self.__celdas[row][col].get_cell_content()
+                self.kill_and_score(row, col)
+                ficha = self.__cells_array[row][col].get_cell_content()
                 ficha.kill()
-                self.__celdas[row][col].borrarFicha()
-                columnasConAgujeros.add(col)
-        for alineacion in verticales:
-            for item in alineacion:
+                self.__cells_array[row][col].borrarFicha()
+                incomplete_columns.add(col)
+        for alginment in vertical:
+            for item in alginment:
                 row = item[0]
                 col = item[1]
-                if(self.__celdas[row][col].hayFicha()):
-                    ficha = self.__celdas[row][col].get_cell_content()
+                if(self.__cells_array[row][col].hayFicha()):
+                    ficha = self.__cells_array[row][col].get_cell_content()
                     ficha.kill()
-                    self.__celdas[row][col].borrarFicha()
-                columnasConAgujeros.add(col)
-        self.__alineaciones = []
-        return columnasConAgujeros
+                    self.__cells_array[row][col].borrarFicha()
+                incomplete_columns.add(col)
+        self.__aligned_list = []
+        return incomplete_columns
 
-    def filaTieneAgujeros(self, fila):
-        tieneAgujeros = False
-        for celda in self.__celdas[fila]:
+    def row_has_holes(self, fila):
+        has_holes = False
+        for celda in self.__cells_array[fila]:
             if(not celda.hayFicha()):
-                tieneAgujeros = True
+                has_holes = True
                 break
-        return tieneAgujeros
+        return has_holes
 
-    def actualizarFilaCaenNuevasFichas(self, ventana, colorFondo, nuevaFila):
-        '''Actualiza la fila para la transición de
-        la caida de fichas cuando hay nuevas fichas que rellenan agujeros'''
-        while(self.__estanCayendo):
-            ventana.fill(colorFondo)
-            celdas = self.__celdas
-            for row in range(len(celdas)):
-                for col in range(len(celdas[row])):
-                    celda = celdas[row][col]
-                    draw.rect(ventana, celda.getColorCelda(), celda.getRect())
-            for ficha in nuevaFila:
-                if(ficha is not None):
-                    self.__estanCayendo = False
-                    if(ficha.is_falling()):
-                        self.__estanCayendo = True
-                        break
-            self.__grupoFichas.update(ventana)
-            pygame.display.update()
-
-    def nuevasFichasPorFilas(self):
+    def new_chips_per_row(self):
         '''Pide al calculador las nuevas fichas
         para completar el tablero'''
-        self.enviarActualizacionAlineaciones()
-        for row in reversed(range(len(self.__celdas))):
-            if(self.filaTieneAgujeros(row)):
+        self.update_chips_calculator()
+        for row in reversed(range(len(self.__cells_array))):
+            if(self.row_has_holes(row)):
                 nuevaFila = self.handler.requestNuevasFichasPorFila(row)
                 for col in range(len(nuevaFila)):
-                    posicionAparecen = self.__celdas[0][col]. \
+                    posicionAparecen = self.__cells_array[0][col]. \
                                        get_center_pos()
                     if(nuevaFila[col] is not None):
                         ficha = nuevaFila[col]
-                        celdaDestino = self.__celdas[row][col]
+                        celdaDestino = self.__cells_array[row][col]
                         ficha.set_center_pos(*posicionAparecen)
                         ficha.set_target_cell(celdaDestino)
                         ficha.set_target_position(
                               celdaDestino.get_center_pos()[1])
                         ficha.set_initial_speed(VELOCIDAD_RELLENO)
-                        self.agregarFichasAGrupo(ficha)
+                        self.add_chips_to_group(ficha)
                         ficha.set_dropped(True)
-                        self.__estanCayendo = True
                         self.__view.draw_filling_board(nuevaFila,
-                                                       self.__celdas,
-                                                       self.__grupoFichas)
+                                                       self.__cells_array,
+                                                       self.__chips_spr_group)
                 for ficha in nuevaFila:
                     if(ficha is not None):
                         celdaDestino = ficha.get_target_cell()
                         celdaDestino.setFicha(ficha=ficha)
                         ficha.set_target_cell(None)
                         ficha.set_origin_cell(celdaDestino)
-        self.enviarActualizacionAlineaciones()
+        self.update_chips_calculator()
 
-    def alineacionEnTablero(self):
-        if(self.__alineaciones != []):
-            columnas = self.eliminarFichasAlineadas()
-            self.ocuparAgujeros(columnas)
-            self.nuevasFichasPorFilas()
-        self.__alineaciones = []
-        self.__matches = False
-
-    def actualizarTableroCompleto(self):
+    def complete_chips_scan(self):
         '''Actualiza el tablero. Sin pedir fichas al calculador.
         Si está completo (ya se dibujaron todas las celdas),
         recorre la matriz de celdas en busca de cambios de
-        estado.
-        ventana es una Surface
-        x_celda el tamaño de la celda cuadrada.
-        x_espaciado es el espaciado entre las celdas.
-        color_base es el color de la celda
-        fichas es la matriz (objetos) de fichas'''
-        celdas = self.__celdas
+        estado.'''
+        celdas = self.__cells_array
         for row in range(len(celdas)):
             for col in range(len(celdas[row])):
                 celda = celdas[row][col]
                 if(celda.hayFicha()):
                     '''La ficha existe'''
-                    self.agregarFichasAGrupo(celda.get_cell_content())
+                    self.add_chips_to_group(celda.get_cell_content())
                 else:
                     '''La ficha se eliminó'''
-                    self.__celdas[row][col].borrarFicha()
+                    self.__cells_array[row][col].borrarFicha()
 
-    def agregarFichasAGrupo(self, fichas):
+    def add_chips_to_group(self, fichas):
         try:
             for row in fichas:
                 for ficha in row:
                     if(ficha is not None):
-                        self.__grupoFichas.add(fichas)
+                        self.__chips_spr_group.add(fichas)
         except TypeError:
             if(fichas is not None):
-                self.__grupoFichas.add(fichas)
+                self.__chips_spr_group.add(fichas)
 
     def main_board_update(self):
         ''' Actualiza el tablero, segun el estado de las fichas
         y las alineaciones.\n
         El programa principal debe llamar a esta función en cada iteración'''
-        if(not self.__celdasEstanCompletas):
+        if(not self.__cells_ready):
             fichas = self.handler.requestFichas(N_CELDAS)
-            self.agregarFichasAGrupo(fichas)
-            self.generarTableroFilaPorFila(fichas)
+            self.add_chips_to_group(fichas)
+            self.start_board(fichas)
         else:
-            if(self.__matches):
-                return self.__matches
-            self.enviarActualizacionAlineaciones()
-            self.actualizarTableroCompleto()
-            self.__matches = self.buscarAlineacionFichas()
-            self.__view.draw_cells(self.__celdas)
-            self.__view.update_chips(self.__grupoFichas)
+            if(self.__aligned_list != []):
+                return self.__aligned_list
+            self.update_chips_calculator()
+            self.complete_chips_scan()
+            self.scan_alignments()
+            self.__view.draw_cells(self.__cells_array)
+            self.__view.update_chips(self.__chips_spr_group)
+        return []
 
-    def deseleccionarTodasCeldas(self):
+    def unselect_all_cells(self):
         '''Recorre la matriz de celdas y deselecciona
         una por una'''
-        for row in range(len(self.__celdas)):
-            for col in range(len(self.__celdas[row])):
-                celda = self.__celdas[row][col]
+        for row in range(len(self.__cells_array)):
+            for col in range(len(self.__cells_array[row])):
+                celda = self.__cells_array[row][col]
                 if(celda.hayFicha()):
                     celda.deseleccionarFicha()
 
-    def limpiarSeleccionCeldas(self):
+    def clear_selection(self):
         '''Vacia la lista de seleccionadas en el calculador \n
         Deselecciona todas las celdas del tablero \n
         Setea el valor de 'matches' a False'''
-        self.handler.limpiarSeleccion()
-        self.deseleccionarTodasCeldas()
-        self.__matches = False
+        self.handler.clear_selection()
+        self.unselect_all_cells()
+        self.__aligned_list = []
 
-    def actualizarTableroSwapping(self, ventana, colorFondo, swapping):
-        '''Actualiza el tablero mientras se intercambian fichas'''
-        while(self.__estanSwapping):
-            ventana.fill(colorFondo)
-            celdas = self.__celdas
-            for row in range(len(celdas)):
-                for col in range(len(celdas[row])):
-                    celda = celdas[row][col]
-                    draw.rect(ventana, celda.getColorCelda(), celda.getRect())
-            for ficha in swapping:
-                if(ficha is not None):
-                    self.__estanSwapping = False
-                    if(ficha.is_swapping()):
-                        self.__estanSwapping = True
-                        break
-            self.__grupoFichas.update(ventana)
-            pygame.display.update()
-
-    def swapFichas(self, x1, y1, x2, y2):
+    def chips_swap(self, x1, y1, x2, y2):
         '''Intercambia las fichas entre las celdas'''
-        celda1 = self.__celdas[x1][y1]
-        celda2 = self.__celdas[x2][y2]
+        celda1 = self.__cells_array[x1][y1]
+        celda2 = self.__cells_array[x2][y2]
         fichasSwapping = []
         # Asignar ficha origen y destino: Ficha 1
         ficha1 = celda1.get_cell_content()
@@ -401,12 +331,11 @@ class Board:
         ficha2.set_origin_cell(celda2)
         ficha2.set_target_cell(celda1)
         ficha2.set_swapping(True)
-        self.__estanSwapping = True
         fichasSwapping.append(ficha1)
         fichasSwapping.append(ficha2)
         # Actualizar durante animacion
-        self.__view.draw_swapping_chips(self.__celdas, fichasSwapping,
-                                        self.__grupoFichas)
+        self.__view.draw_swapping_chips(self.__cells_array, fichasSwapping,
+                                        self.__chips_spr_group)
         # Setear celdaOrigen
         ficha1.set_origin_cell(celda2)
         ficha2.set_origin_cell(celda1)
@@ -415,7 +344,7 @@ class Board:
         celda1.setFicha(ficha=ficha2)
         celda2.setFicha(ficha=ficha1)
 
-    def clickXY(self, x, y):
+    def click_action(self, x, y):
         '''Busca cuál fue la casilla clickeada
         y dispara la lógica de selección de las fichas'''
         limpiar = False
@@ -425,10 +354,10 @@ class Board:
             if(limpiar):
                 break
             for col in range(len(fichas[row])):
-                celda = self.__celdas[row][col]
+                celda = self.__cells_array[row][col]
                 if(celda.esClickeada(x, y) and celda.hayFicha()):
                     dentroCuadricula = True
-                    token_class = self.__celdas[row][col].get_cell_content() \
+                    token_class = self.__cells_array[row][col].get_cell_content() \
                         .get_class()
                     if(token_class in NOT_CLICKABLE):
                         break
@@ -438,23 +367,23 @@ class Board:
                     else:
                         p0 = estadoFicha['anterior']
                         if(p0 is not None):
-                            self.__celdas[p0[0]][p0[1]].deseleccionarFicha()
+                            self.__cells_array[p0[0]][p0[1]].deseleccionarFicha()
                         celda.deseleccionarFicha()
                     if(estadoFicha['swap']):
                         p0 = estadoFicha['anterior']
-                        self.swapFichas(row, col, p0[0], p0[1])
-                        self.enviarActualizacionAlineaciones()
+                        self.chips_swap(row, col, p0[0], p0[1])
+                        self.update_chips_calculator()
                         limpiar = True
                         break
                     break
         if(not dentroCuadricula):
             print("Fuera del tablero")
         if(limpiar):
-            self.limpiarSeleccionCeldas()
+            self.clear_selection()
 
-    def posicionarSelector(self, x, y):
-        for row in range(len(self.__celdas)):
-            for col in range(len(self.__celdas[row])):
-                celda = self.__celdas[row][col]
+    def locate_selector(self, x, y):
+        for row in range(len(self.__cells_array)):
+            for col in range(len(self.__cells_array[row])):
+                celda = self.__cells_array[row][col]
                 if(celda.getRect().collidepoint(x, y)):
                     return (row, col)

@@ -119,7 +119,7 @@ class Calculador(object):
                 alineacion.limpiarSeleccion()
             else:
                 print("Swapping: [%d, %d] con [%d, %d]" % (x, y, *primerItem))
-                self.swapFichas(*primerItem, *(x, y))
+                self.chips_swap(*primerItem, *(x, y))
                 estado['swap'] = True
                 estado['anterior'] = primerItem
         else:
@@ -135,7 +135,7 @@ class Calculador(object):
         self.__fichas.clear()
         self.__fichas = []
 
-    def swapFichas(self, x1, y1, x2, y2):
+    def chips_swap(self, x1, y1, x2, y2):
         fichas = self.__fichas
         aux = fichas[x1][y1]
         fichas[x1][y1] = fichas[x2][y2]
@@ -166,14 +166,10 @@ class Calculador(object):
         '''Se encarga de:\n
         Buscar alineaciones horizontales,\n
         Buscar alineaciones verticales,\n
-        Poner en -1 las fichas alineadas.\n
-        Devuelve False si no hay alineaciones'''
-        alineacionesH = self.__alineaciones.buscarHorizontales(
-                                            self.__fichas, 3)
-        alineacionesV = self.__alineaciones.buscarVerticales(self.__fichas, 3)
-        if(alineacionesH != [] or alineacionesV != []):
-            return self.__alineaciones.getAlineaciones()
-        return False
+        Poner en -1 las fichas alineadas.\n'''
+        self.__alineaciones.buscarHorizontales(self.__fichas, 3)
+        self.__alineaciones.buscarVerticales(self.__fichas, 3)
+        return self.__alineaciones.getAlineaciones()
 
     def filaFichasNuevas(self, fila):
         '''Actualiza su matriz de fichas a medida que va

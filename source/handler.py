@@ -85,7 +85,7 @@ class Handler(object):
             self.__fichas = fichasNuevas
             return self.__fichas
 
-    def limpiarSeleccion(self):
+    def clear_selection(self):
         '''Vacia la lista de fichas seleccionadas'''
         self.__calculador.limpiarFichasSeleccionadas()
 
@@ -111,7 +111,7 @@ class Handler(object):
         fichas alienadas. Devuelve False si no se anulo nada.'''
         return self.__calculador.logicaEliminacionFichas()
 
-    def reiniciarCalculador(self):
+    def restart_chips(self):
         self.__calculador.limpiarFichasSeleccionadas()
         self.__calculador.vaciarMatrizFichasEnteros()
 

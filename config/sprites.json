@@ -11,27 +11,27 @@
         "num_frames": 33,
         "width_px": 60,
         "height_px": 60,
-        "anim_speed": 0.4
+        "anim_speed": 0.5
     },
     "2": {
         "path": "assets\\sprites\\spr_mushroom2.png",
         "num_frames": 33,
         "width_px": 60,
         "height_px": 60,
-        "anim_speed": 0.35
+        "anim_speed": 0.5
     },
     "3": {
         "path": "assets\\sprites\\spr_mushroom3.png",
         "num_frames": 50,
         "width_px": 60,
         "height_px": 60,
-        "anim_speed": 0.4
+        "anim_speed": 0.5
     },
     "4": {
         "path": "assets\\sprites\\spr_mushroom4.png",
         "num_frames": 50,
         "width_px": 60,
         "height_px": 60,
-        "anim_speed": 0.4
+        "anim_speed": 0.5
     }
 }

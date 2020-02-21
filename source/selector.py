@@ -12,7 +12,7 @@ class Selector(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self._coord = (0, 0)
         self._board = board
-        self._celdas = board.getCeldas()
+        self._celdas = board.get_cells()
         self._posicionar()
 
 #   \\
@@ -32,7 +32,7 @@ class Selector(pygame.sprite.Sprite):
 
     def _setCeldas(self):
         '''Pide las celdas'''
-        self._celdas = self._board.getCeldas()
+        self._celdas = self._board.get_cells()
 
     def _posicionar(self):
         '''Posiciona el selector en la celda
