@@ -7,7 +7,6 @@ from cellContent import UnbreakableBlock
 class Handler(object):
 
     def __init__(self, tamanio):
-        print("Handler")
         self.__fichas = []
         self.__calculador = Calculador(tamanio)
 

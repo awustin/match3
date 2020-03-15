@@ -72,6 +72,10 @@ class Celda(object):
     def borrarFicha(self):
         self.__ficha = None
 
+    def kill_chip(self):
+        self.__ficha.kill()
+        self.__ficha = None
+
 # //
 # Métodos sobre la celda
 # //

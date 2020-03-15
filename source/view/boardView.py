@@ -1,6 +1,16 @@
+import sys
 from pygame import draw
 from pygame import time
 import pygame
+from customEnums import TipoTexto
+from view.texto import Texto
+
+sys.path.insert(0, 'config')
+try:
+    import globales
+except Exception as e:
+    print(e)
+    raise
 
 
 BASE_CELL_COLOR = (20, 40, 80)
@@ -18,11 +28,15 @@ class BoardView():
 
     def __init__(self, display):
         """ Virtually private constructor. """
-        self.__display = display
         if BoardView.__instance is not None:
             raise Exception("This class is a singleton!")
         else:
             BoardView.__instance = self
+            self.__display = display
+            self.__fruity = 0
+            self.__bitter = 0
+            self.__rotten = 0
+            self.__init_score_text()
 
 # DRAW FUNCTIONS -----------------------------------------
     def update_background(self):
@@ -57,6 +71,7 @@ class BoardView():
                         chips_are_swapping = True
                         break
             sprite_group.update(display)
+            self.draw_score()
             pygame.display.update()
 
     def draw_falling_chips(self, cell_array, sprite_group):
@@ -73,8 +88,9 @@ class BoardView():
                     chips_are_falling = True
                     break
             sprite_group.update(display)
+            self.draw_score()
             pygame.display.update()
-    
+
     def draw_filling_board(self, new_row, cell_array, sprite_group):
         '''Actualiza la fila para la transición de
         la caida de fichas cuando hay nuevas fichas que rellenan agujeros'''
@@ -90,6 +106,7 @@ class BoardView():
                         chips_are_falling = True
                         break
             sprite_group.update(display)
+            self.draw_score()
             pygame.display.update()
 
     def update_chips(self, sprite_group):
@@ -97,3 +114,37 @@ class BoardView():
 
     def update_selector_position(self, selector):
         selector.update(self.__display.get_display())
+
+# SCORE FUNCTIONS -----------------------------------------------
+    def set_score(self, fruity, bitter, rotten):
+        self.__fruity = fruity
+        self.__bitter = bitter
+        self.__rotten = rotten
+
+    def __refresh_score(self):
+        self.__fruity_info = Texto(f'Fruity {self.__fruity}', globales.FONT,
+                                   (120, 3, 12), TipoTexto.INFO)
+        self.__bitter_info = Texto(f'Bitter {self.__bitter}', globales.FONT,
+                                   (120, 3, 12), TipoTexto.INFO)
+        self.__rotten_info = Texto(f'Rotten {self.__rotten}', globales.FONT,
+                                   (120, 3, 12), TipoTexto.INFO)
+        self.__fruity_info.setPosicion((5, 140))
+        self.__bitter_info.setPosicion((5, 180))
+        self.__rotten_info.setPosicion((5, 220))
+
+    def __init_score_text(self):
+        self.__score_info = Texto('SCORE', globales.FONT,
+                                  (120, 3, 12), TipoTexto.INFO)
+        self.__score_info.setPosicion((2, 100))
+        self.__refresh_score()
+
+    def draw_score(self):
+        self.__refresh_score()
+        self.__display.draw(self.__fruity_info.getSurface(),
+                            self.__fruity_info.getPosicion())
+        self.__display.draw(self.__bitter_info.getSurface(),
+                            self.__bitter_info.getPosicion())
+        self.__display.draw(self.__rotten_info.getSurface(),
+                            self.__rotten_info.getPosicion())
+        self.__display.draw(self.__score_info.getSurface(),
+                            self.__score_info.getPosicion())

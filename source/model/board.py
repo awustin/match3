@@ -18,7 +18,7 @@ X_CUAD = 480
 Y_CUAD = X_CUAD
 BASE_CELL_COLOR = (20, 40, 80)
 BKG_COLOR = (120, 100, 50)
-X_OFF = (globales.DIMENSION[0] - X_CUAD) / 2
+X_OFF = (globales.DIMENSION[0] - X_CUAD) / 2 + 70
 Y_OFF = (globales.DIMENSION[1] - Y_CUAD) / 2
 N_CELDAS = 8
 X_CELDA = X_CUAD/N_CELDAS
@@ -47,6 +47,16 @@ class Board:
     def get_cells(self):
         '''Devuelve la matriz de celdas'''
         return self.__cells_array
+
+    def get_chips(self, coord_list):
+        '''Arguments: \n
+        list: is a list of tuples (row, col)'''
+        chip_list = []
+        if coord_list != [] and coord_list is not None:
+            for coord in coord_list:
+                chip = self.__cells_array[coord[0]][coord[1]].get_cell_content()
+                chip_list.append(chip)
+        return chip_list
 
     def clear_cells_array(self):
         self.__cells_array.clear()
@@ -182,39 +192,9 @@ class Board:
         self.__view.draw_falling_chips(self.__cells_array, self.__chips_spr_group)
         self.asign_new_origin_cells(columnas)
 
-    def kill_and_score(self, row, col):
-        '''Scoring an aligned chip.
-        This will eliminate it.'''
-        print(f'{row} , {col} SCORES! ')
-        pass
-
-    def eliminate_aligned_chips(self):
-        '''Elimina las fichas que se alinearon,
-        y devuelve un conjunto con las columnas
-        que tienen agujeros'''
-        horizontal = self.__aligned_list[0]
-        vertical = self.__aligned_list[1]
-        incomplete_columns = set()
-        for alginment in horizontal:
-            for item in alginment:
-                row = item[0]
-                col = item[1]
-                self.kill_and_score(row, col)
-                ficha = self.__cells_array[row][col].get_cell_content()
-                ficha.kill()
-                self.__cells_array[row][col].borrarFicha()
-                incomplete_columns.add(col)
-        for alginment in vertical:
-            for item in alginment:
-                row = item[0]
-                col = item[1]
-                if(self.__cells_array[row][col].hayFicha()):
-                    ficha = self.__cells_array[row][col].get_cell_content()
-                    ficha.kill()
-                    self.__cells_array[row][col].borrarFicha()
-                incomplete_columns.add(col)
-        self.__aligned_list = []
-        return incomplete_columns
+    def kill_aligned_chip(self, row, col):
+        if self.__cells_array[row][col].hayFicha():
+            self.__cells_array[row][col].kill_chip()
 
     def row_has_holes(self, fila):
         has_holes = False

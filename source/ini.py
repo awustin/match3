@@ -7,6 +7,7 @@ from cellContent import Chip
 from controllers.inputController import InputController
 from controllers.gameController import GameController
 import spritesData as sprites
+import scoreData as scores
 
 sys.path.insert(0, 'config')
 try:
@@ -26,6 +27,7 @@ class App:
         self.__game_controller = GameController()
         self.__game_controller.init_game()
         sprites.init_sprite_data()
+        scores.init_score_data()
 
     def main_menu(self):
         global GAME_OVER

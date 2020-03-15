@@ -1,0 +1,67 @@
+{
+    "-2": {
+        "path": "assets\\sprites\\unbreakable.png",
+        "num_frames": 1,
+        "width_px": 60,
+        "height_px": 60,
+        "anim_speed": 0,
+        "score_data": {
+            "base_value": 1,
+            "fruity": 1,
+            "bitter": 1,
+            "rotten": 1
+        }
+    },
+    "1": {
+        "path": "assets\\sprites\\spr_mushroom1.png",
+        "num_frames": 33,
+        "width_px": 60,
+        "height_px": 60,
+        "anim_speed": 0.5,
+        "score_data": {
+            "base_value": 1,
+            "fruity": 1.1,
+            "bitter": 0,
+            "rotten": 0
+        }
+    },
+    "2": {
+        "path": "assets\\sprites\\spr_mushroom2.png",
+        "num_frames": 33,
+        "width_px": 60,
+        "height_px": 60,
+        "anim_speed": 0.5,
+        "score_data": {
+            "base_value": 1,
+            "fruity": 0,
+            "bitter": 0.9,
+            "rotten": 0.1
+        }
+    },
+    "3": {
+        "path": "assets\\sprites\\spr_mushroom3.png",
+        "num_frames": 50,
+        "width_px": 60,
+        "height_px": 60,
+        "anim_speed": 0.5,
+        "score_data": {
+            "base_value": 1,
+            "fruity": 2,
+            "bitter": 0,
+            "rotten": 0.5
+        }
+    },
+    "4": {
+        "path": "assets\\sprites\\spr_mushroom4.png",
+        "num_frames": 50,
+        "width_px": 60,
+        "height_px": 60,
+        "anim_speed": 0.5,
+        "score_data": {
+            "base_value": 1,
+            "fruity": 0,
+            "bitter": 2,
+            "rotten": 1
+        }
+    }
+}

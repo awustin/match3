@@ -14,7 +14,7 @@ except Exception as e:
     raise
 
 
-SPR_CONFIG_FILE = os.path.join(CONFIG_FOLDER, 'sprites.json')
+SPR_CONFIG_FILE = os.path.join(CONFIG_FOLDER, 'chips_config.json')
 SPRITES = {}
 
 

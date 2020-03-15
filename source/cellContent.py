@@ -1,5 +1,6 @@
 import pygame
 import spritesData
+import scoreData
 
 GRAVITY = 5
 SWAP_SPEED = 7
@@ -173,6 +174,7 @@ class CellContent(pygame.sprite.Sprite):
 class Chip(CellContent):
     def __init__(self, cell_class=0):
         super().__init__(cell_class)
+        self.__load_flavor_values()
         self.set_selected(False)
 
 # //
@@ -198,6 +200,27 @@ class Chip(CellContent):
         self.__selected = False
         self._dropped = False
         self.__swap = flag
+
+# //
+# Scoring methods
+# //
+    def __load_flavor_values(self):
+        self.__base_value = scoreData.get_base_value(key=super().get_class())
+        self.__fruity = scoreData.get_fruity(key=super().get_class())
+        self.__bitter = scoreData.get_bitter(key=super().get_class())
+        self.__rotten = scoreData.get_rotten(key=super().get_class())
+
+    def get_base_value(self):
+        return self.__base_value
+
+    def get_fruity(self):
+        return self.__fruity
+
+    def get_bitter(self):
+        return self.__bitter
+
+    def get_rotten(self):
+        return self.__rotten
 
 # //
 # Update

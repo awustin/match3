@@ -118,7 +118,6 @@ class Calculador(object):
                 estado['anterior'] = primerItem
                 alineacion.limpiarSeleccion()
             else:
-                print("Swapping: [%d, %d] con [%d, %d]" % (x, y, *primerItem))
                 self.chips_swap(*primerItem, *(x, y))
                 estado['swap'] = True
                 estado['anterior'] = primerItem

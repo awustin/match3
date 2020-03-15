@@ -14,7 +14,7 @@ class Texto(object):
         elif(tipo == customEnums.TipoTexto.TITULO):
             self.__fontObject = font.Font(fuente, 45)
         elif(tipo == customEnums.TipoTexto.INFO):
-            self.__fontObject = font.Font(fuente, 9)
+            self.__fontObject = font.Font(fuente, 20)
         self.__surfObject = self.__fontObject.render(str(string), 1, colorRGB)
 
     def getFont(self):

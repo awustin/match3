@@ -68,7 +68,6 @@ class Alineacion(object):
                     continue
                 if((horizontal[0] - candidato) != 0):
                     if(len(horizontal) > n-1):
-                        print(f'FILA {row}: {alineadas}')
                         alineacionesH.append(alineadas)
                         cont = cont + 1
                     horizontal = []
@@ -76,7 +75,6 @@ class Alineacion(object):
                 horizontal.append(candidato)
                 alineadas.append((row, col))
             if(len(horizontal) > n-1):
-                print(f'FILA {row}: {alineadas}')
                 alineacionesH.append(alineadas)
                 cont = cont + 1
             horizontal = []
@@ -102,7 +100,6 @@ class Alineacion(object):
                     continue
                 if((vertical[0] - candidato) != 0):
                     if(len(vertical) > n-1):
-                        print(f'COL {col}: {alineadas}')
                         alineacionesV.append(alineadas)
                         cont = cont + 1
                     vertical = []
@@ -110,7 +107,6 @@ class Alineacion(object):
                 vertical.append(candidato)
                 alineadas.append((row, col))
             if(len(vertical) > n-1):
-                print(f'COL {col}: {alineadas}')
                 alineacionesV.append(alineadas)
                 cont = cont + 1
             vertical = []
