@@ -68,6 +68,11 @@ class GameController():
                                     self.__score.get_rotten())
         self.__board_view.draw_score()
 
+    def chip_elimination(self, row, col):
+        center = self.__board.get_cells()[row][col].get_center_pos()
+        self.__board.kill_aligned_chip(row, col)
+        return center
+
     def score_alignments(self):
         horizontal = self.__board.get_aligned_list()[0]
         vertical = self.__board.get_aligned_list()[1]
@@ -75,21 +80,28 @@ class GameController():
         for alignment in horizontal:
             self.__score.compute_score(self.__board.get_chips(alignment))
             self.refresh_scores()
+            origins = []
             for item in alignment:
-                self.__board.kill_aligned_chip(item[0], item[1])
+                center = self.chip_elimination(item[0], item[1])
+                origins.append(center)
                 incomplete_columns.add(item[1])
+            self.__board_view.run_alignment_effects(origins)
         for alignment in vertical:
             self.__score.compute_score(self.__board.get_chips(alignment))
             self.refresh_scores()
+            origins = []
             for item in alignment:
-                self.__board.kill_aligned_chip(item[0], item[1])
+                center = self.chip_elimination(item[0], item[1])
+                origins.append(center)
                 incomplete_columns.add(item[1])
+            self.__board_view.run_alignment_effects(origins)
         self.__board.clear_aligned_list()
         return incomplete_columns
 
     def main_board_tick(self):
         self.__board_view.update_background()
         self.__board_view.draw_score()
+        self.__board_view.update_effects()
         aligned_list = self.__board.main_board_update()
         if (aligned_list != []):
             incomplete_columns = self.score_alignments()

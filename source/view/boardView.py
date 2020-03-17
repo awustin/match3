@@ -4,6 +4,7 @@ from pygame import time
 import pygame
 from customEnums import TipoTexto
 from view.texto import Texto
+from view.visualEffects import VisualEffects
 
 sys.path.insert(0, 'config')
 try:
@@ -33,12 +34,13 @@ class BoardView():
         else:
             BoardView.__instance = self
             self.__display = display
+            self.__fx = VisualEffects()
             self.__fruity = 0
             self.__bitter = 0
             self.__rotten = 0
             self.__init_score_text()
 
-# DRAW FUNCTIONS -----------------------------------------
+# CELL FUNCTIONS -----------------------------------------
     def update_background(self):
         global BKG_COLOR
         self.__display.bkg_color(BKG_COLOR)
@@ -49,6 +51,7 @@ class BoardView():
                 cell = cell_array[row][col]
                 draw.rect(self.__display.get_display(), cell.getColorCelda(),
                           cell.getRect())
+        self.update_effects()
 
     def draw_initial_chips(self, chip_array):
         for row in reversed(range(len(chip_array))):
@@ -56,6 +59,7 @@ class BoardView():
                 time.wait(7)
                 chip_array[row][col].update(self.__display.get_display())
                 pygame.display.update()
+        self.update_effects()
 
     def draw_swapping_chips(self, cell_array, swapping, sprite_group):
         '''Actualiza el tablero mientras se intercambian fichas'''
@@ -72,6 +76,7 @@ class BoardView():
                         break
             sprite_group.update(display)
             self.draw_score()
+            self.update_effects()
             pygame.display.update()
 
     def draw_falling_chips(self, cell_array, sprite_group):
@@ -89,6 +94,7 @@ class BoardView():
                     break
             sprite_group.update(display)
             self.draw_score()
+            self.update_effects()
             pygame.display.update()
 
     def draw_filling_board(self, new_row, cell_array, sprite_group):
@@ -107,6 +113,7 @@ class BoardView():
                         break
             sprite_group.update(display)
             self.draw_score()
+            self.update_effects()
             pygame.display.update()
 
     def update_chips(self, sprite_group):
@@ -148,3 +155,12 @@ class BoardView():
                             self.__rotten_info.getPosicion())
         self.__display.draw(self.__score_info.getSurface(),
                             self.__score_info.getPosicion())
+
+# FX ------------------------------------------------------------
+    def run_alignment_effects(self, origins):
+        'Pass in all the origins of the animation'
+        self.__fx.run_sparkles_alignment(origins)
+        self.__fx.run_power_ratio(origins)
+
+    def update_effects(self):
+        self.__fx.update_effects_sparkles_alignment(self.__display.get_display())
