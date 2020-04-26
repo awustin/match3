@@ -337,8 +337,8 @@ class Board:
                 celda = self.__cells_array[row][col]
                 if(celda.esClickeada(x, y) and celda.hayFicha()):
                     dentroCuadricula = True
-                    token_class = self.__cells_array[row][col].get_cell_content() \
-                        .get_class()
+                    token_class = self.__cells_array[row][col] \
+                        .get_cell_content().get_class()
                     if(token_class in NOT_CLICKABLE):
                         break
                     estadoFicha = self.handler.seleccionFichasYEstado(row, col)
@@ -347,7 +347,8 @@ class Board:
                     else:
                         p0 = estadoFicha['anterior']
                         if(p0 is not None):
-                            self.__cells_array[p0[0]][p0[1]].deseleccionarFicha()
+                            self.__cells_array[p0[0]][p0[1]] \
+                                .deseleccionarFicha()
                         celda.deseleccionarFicha()
                     if(estadoFicha['swap']):
                         p0 = estadoFicha['anterior']

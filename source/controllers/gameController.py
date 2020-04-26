@@ -5,6 +5,8 @@ from view.boardView import BoardView
 from model.board import Board
 from model.score import Score
 from selector import Selector
+import controllers.spritesData as sprites
+import controllers.scoreData as scores
 
 
 class GameController():
@@ -41,6 +43,8 @@ class GameController():
     def init_game(self):
         self.__init_screen()
         self.__init_board()
+        sprites.init_sprite_data()
+        scores.init_score_data()
 
 # FUNCTIONS ---------------------------------------------------------
     def main_menu_tick(self):

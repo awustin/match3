@@ -19,9 +19,14 @@ class AlignmentSparkles():
     def __init__(self):
         self.__run = False
         self.__end = False
+        self.__init_effect()
         self.__image_weak = SPARK_WEAK
         self.__step = 0
         self.__particles_groups = []
+
+    def __init_effect(self):
+        global SPARK_WEAK
+        SPARK_WEAK.convert()
 
     def run_particles(self):
         self.__run = True

@@ -17,7 +17,7 @@ class Viewport(object):
                                               pygame.DOUBLEBUF)
 
     def init_viewport(self, logoDir, caption):
-        self.__logosurf = pygame.image.load(logoDir)
+        self.__logosurf = pygame.image.load(logoDir).convert()
         pygame.display.set_icon(self.__logosurf)
         self.__caption = pygame.display.set_caption(caption)
 

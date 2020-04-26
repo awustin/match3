@@ -24,10 +24,16 @@ class Alineacion(object):
     def getSeleccionadas(self):
         return self.__fichasSeleccionadas
 
+    def get_selected(self, i=-1):
+        if i == -1:
+            return self.__fichasSeleccionadas
+        if i < len(self.__fichasSeleccionadas):
+            return self.__fichasSeleccionadas[i]
+        return None
+
     # FIFO
 
     # Alineaciones
-
     def hayAlineaciones(self):
         return len(self.__alineaciones) != 0
 
@@ -47,6 +53,9 @@ class Alineacion(object):
         self.__fichasSeleccionadas.append(item)
 
     def limpiarSeleccion(self):
+        self.__fichasSeleccionadas.clear()
+
+    def clear_selected(self):
         self.__fichasSeleccionadas.clear()
 
     def buscarHorizontales(self, matriz, n):
@@ -114,3 +123,42 @@ class Alineacion(object):
         self.__alineaciones.append(alineacionesV)
         return alineacionesV
 
+    def __forward(self, y, row):
+        if y == 7:
+            return 1
+        if row[y] != row[y+1]:
+            return 1
+        count = 1 + self.__forward(y+1, row)
+        return count
+
+    def __back(self, y, row):
+        if y == 0:
+            return 0
+        if row[y] != row[y-1]:
+            return 0
+        count = 1 + self.__back(y-1, row)
+        return count
+
+    def __down(self, x, y, array):
+        if x == 7:
+            return 1
+        if array[x][y] != array[x+1][y]:
+            return 1
+        count = 1 + self.__down(x+1, y, array)
+        return count
+
+    def __up(self, x, y, array):
+        if x == 0:
+            return 0
+        if array[x][y] != array[x-1][y]:
+            return 0
+        count = 1 + self.__up(x-1, y, array)
+        return count
+
+    def search_adjacent(self, x, y, temp_array):
+        row = temp_array[x]
+        count_forward = self.__forward(y, row)
+        count_backward = self.__back(y, row)
+        count_downward = self.__down(x, y, temp_array)
+        count_upward = self.__up(x, y, temp_array)
+        return [count_forward + count_backward, count_downward + count_upward]

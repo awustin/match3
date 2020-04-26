@@ -1,6 +1,6 @@
 import pygame
-import spritesData
-import scoreData
+import controllers.spritesData as spritesData
+import controllers.scoreData as scoreData
 
 GRAVITY = 5
 SWAP_SPEED = 7

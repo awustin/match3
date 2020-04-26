@@ -94,6 +94,49 @@ class Calculador(object):
             self.__fichas.append(fila)
         return fila
 
+    def __equals_first_selected(self, x, y):
+        x0 = self.__alineaciones.get_selected(0)[0]
+        y0 = self.__alineaciones.get_selected(0)[1]
+        return self.__fichas[x0][y0] == self.__fichas[x][y]
+    
+    def __first_selected_class(self):
+        x0 = self.__alineaciones.get_selected(0)[0]
+        y0 = self.__alineaciones.get_selected(0)[1]
+        return self.__fichas[x0][y0]
+
+    def __temp_swapped(self, x0, y0, x1, y1):
+        temp_array = list(self.__fichas)
+        temp_array = self.__swap(x0, y0, x1, y1, temp_array)
+        return temp_array
+
+    def __adjacent_alignments(self, x1, y1):
+        x0 = self.__alineaciones.get_selected(0)[0]
+        y0 = self.__alineaciones.get_selected(0)[1]
+        temp_array = self.__temp_swapped(x0, y0, x1, y1)
+        count = self.__alineaciones.search_adjacent(x1, y1, temp_array)
+        if count[0] < 3 and count[1] < 3:
+            return False
+        return True
+
+    def __is_legal_movement(self, x, y, status):
+        if self.__equals_first_selected(x, y):
+            return False
+        return self.__adjacent_alignments(x, y)
+
+    def __second_selected(self, x, y, status):
+        if not self.__is_legal_movement(x, y, status):
+            status['seleccionada'] = False
+            status['anterior'] = self.__alineaciones.get_selected(0)
+            self.__alineaciones.clear_selected()
+        else:
+            self.__chips_swap(*self.__alineaciones.get_selected(0), *(x, y))
+            status['swap'] = True
+            status['anterior'] = self.__alineaciones.get_selected(0)
+
+    def __first_selected(self, x, y, status):
+        self.__alineaciones.agregarASeleccion((x, y))
+        status['seleccionada'] = True
+
     def logicaSeleccionFichas(self, x, y, estado):
         '''Se fija en la lista de fichas seleccionadas y setea
         el valor de la ficha actual. Argumentos:\n
@@ -101,28 +144,11 @@ class Calculador(object):
         y: es la columna actual\n
         estado: es un diccionario {seleccionada: False, swap: False}\n'''
         alineacion = self.__alineaciones
-        if(not alineacion.haySeleccionadas()):
-            '''Es la primera seleccion'''
-            alineacion.agregarASeleccion((x, y))
-            estado['seleccionada'] = True
-        elif(alineacion.hayUnaSeleccionada()):
-            '''Es la segunda selección'''
-            primerItem = alineacion.getSeleccionadas()[0]
-            x0 = primerItem[0]
-            y0 = primerItem[1]
-            if(primerItem == (x, y) or
-               self.__fichas[x0][y0] == self.__fichas[x][y]):
-                '''Se elije la misma ficha'''
-                print("Se selecciono la misma")
-                estado['seleccionada'] = False
-                estado['anterior'] = primerItem
-                alineacion.limpiarSeleccion()
-            else:
-                self.chips_swap(*primerItem, *(x, y))
-                estado['swap'] = True
-                estado['anterior'] = primerItem
+        if not alineacion.haySeleccionadas():
+            self.__first_selected(x, y, estado)
+        elif alineacion.hayUnaSeleccionada():
+            self.__second_selected(x, y, estado)
         else:
-            print("Hay mas de 2 fichas seleccionadas")
             estado['seleccionada'] = False
             alineacion.limpiarSeleccion()
 
@@ -134,11 +160,14 @@ class Calculador(object):
         self.__fichas.clear()
         self.__fichas = []
 
-    def chips_swap(self, x1, y1, x2, y2):
-        fichas = self.__fichas
-        aux = fichas[x1][y1]
-        fichas[x1][y1] = fichas[x2][y2]
-        fichas[x2][y2] = aux
+    def __chips_swap(self, x0, y0, x1, y1):
+        self.__fichas = self.__swap(x0, y0, x1, y1, self.__fichas)
+
+    def __swap(self, x0, y0, x1, y1, array):
+        aux = array[x0][y0]
+        array[x0][y0] = array[x1][y1]
+        array[x1][y1] = aux
+        return array
 
     def logicaEliminacionFichas(self):
         '''Pone en -1 todos los lugares donde

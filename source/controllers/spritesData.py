@@ -69,7 +69,7 @@ class SpriteData(object):
 
     def __load_surface(self):
         load_from = os.path.join(globales.ROOT_DIR, self.__path)
-        self.__surface = pygame.image.load(load_from)
+        self.__surface = pygame.image.load(load_from).convert_alpha()
 
     def __create_frames(self):
         for i in range(self.__num_frames):
