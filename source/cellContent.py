@@ -36,7 +36,8 @@ class CellContent(pygame.sprite.Sprite):
         self.__anim_speed = 0
 
     def __load_sprite(self):
-        self.__frames = spritesData.get_animation_frames(key=self.__class)
+        self.__frames = spritesData.get_animation_frames(key=self.__class)[0]
+        self.__frames_type1 = spritesData.get_animation_frames(key=self.__class)[1]
         self.__num_frames = spritesData.get_num_frames(key=self.__class)
         self.__anim_speed = spritesData.get_anim_speed(key=self.__class)
         self.image = self.__frames[0]
@@ -154,6 +155,11 @@ class CellContent(pygame.sprite.Sprite):
         self.y_initial = self.rect.centery
         self._dropped = False
 
+    def __get_frame(self, current):
+        if self.is_selected():
+            return self.__frames_type1[current]
+        return self.__frames[current]
+
     def __nextFrame(self):
         self.__current_step = self.__current_step + self.__anim_speed
         pointer = int(self.__current_step)
@@ -161,7 +167,7 @@ class CellContent(pygame.sprite.Sprite):
             self.__current_step = 0
             pointer = 0
         self.__current_frame = pointer
-        self.image = self.__frames[self.__current_frame]
+        self.image = self.__get_frame(self.__current_frame)
 
     def update(self):
         self.__nextFrame()
@@ -250,6 +256,9 @@ class UnbreakableBlock(CellContent):
 
     def __init__(self):
         super().__init__(cell_class=-2)
+
+    def is_selected(self):
+        return False
 
 #  //
 #  Position

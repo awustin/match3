@@ -34,7 +34,9 @@ def get_animation_frames(key='default'):
         print('No sprites data')
         return None
     key = str(key)
-    return SPRITES[key].get_animation_frames()
+    frames = SPRITES[key].get_animation_frames()
+    frames_type1 = SPRITES[key].get_frames_type1()
+    return (frames, frames_type1)
 
 
 def get_num_frames(key='default'):
@@ -59,6 +61,7 @@ class SpriteData(object):
     def __init__(self, spr_object):
         self.__surface = None
         self.__frames = []
+        self.__frames_type1 = []
         self.__path = os.path.normpath(spr_object['path'])
         self.__num_frames = spr_object['num_frames']
         self.__width = spr_object['width_px']
@@ -78,9 +81,16 @@ class SpriteData(object):
                                               self.__width,
                                               self.__height)
             self.__frames.append(frame)
+            frame_type1 = pygame.transform.scale(frame,
+                                                 (int(1.25 * self.__width),
+                                                  int(1.25 * self.__height)))
+            self.__frames_type1.append(frame_type1)
 
     def get_animation_frames(self):
         return self.__frames
+
+    def get_frames_type1(self):
+        return self.__frames_type1
 
     def get_num_frames(self):
         return self.__num_frames
